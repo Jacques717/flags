@@ -22,44 +22,49 @@
      - **Default Screen Height**: 1080
      - **Fullscreen Mode**: Windowed (for testing)
 
-### Step 3: Add System.Speech Reference (Important!)
+### Step 3: Enable Microphone Capability (Optional)
 
-Windows Speech Recognition requires the `System.Speech` assembly. To add it:
+**Note:** For Windows Standalone builds, the Microphone capability checkbox may not be visible in Unity 6. This is normal - `KeywordRecognizer` works with Windows system permissions.
 
+**If you see the Microphone option:**
 1. In Unity, go to **Edit → Project Settings → Player**
-2. Expand **Other Settings**
-3. Under **Configuration**, find **Api Compatibility Level**
-4. Set it to **.NET Framework** (not .NET Standard 2.1)
-5. If you don't see this option, you may need to:
-   - Close Unity
-   - Edit `ProjectSettings/ProjectSettings.asset`
-   - Find `apiCompatibilityLevel` and set it to `6` (.NET Framework)
-   - Or use Unity Hub to change the project's .NET version
+2. Select the **Windows** tab (under "Publishing Settings" or "PC, Mac & Linux Standalone")
+3. Look for **Capabilities** section
+4. Check **Microphone** if available
 
-**Alternative: Manual Assembly Reference**
+**If you don't see it:** That's okay! Just make sure Windows microphone permissions are enabled (see Step 5 below).
 
-If System.Speech is not available, you may need to:
-
-1. Create a file `Assets/mcs.rsp` (if it doesn't exist)
-2. Add this line: `-r:System.Speech.dll`
-3. Note: System.Speech.dll is usually located at:
-   `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\System.Speech.dll`
+**Note:** The game uses Unity's built-in `KeywordRecognizer` which works out of the box on Windows builds. No additional plugins needed!
 
 ### Step 4: Build the Game
 
-1. In **Build Settings**, click **Build**
-2. Choose a folder for your build (e.g., `Builds/Windows`)
+1. In **Build Profiles** window, click the **Build** button (bottom right)
+2. Choose a folder for your build (e.g., create a `Builds` folder in your project)
 3. Unity will create an `.exe` file and a `_Data` folder
 4. Wait for the build to complete
 
-### Step 5: Test the Build
+### Step 5: Enable Windows Microphone Permissions
+
+Before testing, ensure Windows allows microphone access:
+
+1. **Open Windows Settings** (Windows Key + I)
+2. Go to **Privacy → Microphone**
+3. Make sure **"Allow apps to access your microphone"** is ON
+4. **Make sure "Allow desktop apps to access your microphone"** is ON (this is important!)
+5. Test your microphone:
+   - Right-click the speaker icon in system tray
+   - Select **Sounds → Recording**
+   - Speak into your microphone and check if the green bars move
+
+### Step 6: Test the Build
 
 1. Navigate to your build folder
 2. Double-click the `.exe` file to run the game
-3. Test microphone input:
+3. Test speech recognition:
    - Start a game
-   - When prompted, speak a country name clearly
-   - The game should recognize your speech
+   - When you see "Listening..." appear, speak a country name clearly
+   - Try saying: "United States", "Canada", "France", "Germany", etc.
+   - The game should recognize your voice!
 
 ## Windows Speech Recognition Setup
 
@@ -68,27 +73,26 @@ Before testing, ensure Windows Speech Recognition is enabled:
 1. **Open Windows Settings** (Windows Key + I)
 2. Go to **Privacy → Microphone**
 3. Make sure **"Allow apps to access your microphone"** is ON
-4. Go to **Time & Language → Speech**
-5. Make sure **"Online speech recognition"** is enabled (optional, for better accuracy)
-6. Test your microphone:
+4. **Allow desktop apps to access your microphone** should also be ON
+5. Test your microphone:
    - Right-click the speaker icon in system tray
    - Select **Sounds → Recording**
    - Speak into your microphone and check if the green bars move
 
+**How it works:**
+- The game uses Unity's `KeywordRecognizer` which recognizes predefined keywords
+- Supported country names: "United States", "USA", "US", "America", "United Kingdom", "UK", "Britain", "England", "France", "Germany", "Japan", "Canada", "Australia", "Brazil", "India", "Italy"
+- Also recognizes variations: "Deutschland", "Brasil", "Italia"
+- Speak clearly and the game will recognize your voice!
+
 ## Troubleshooting
 
-### "System.Speech not found" Error
+### "KeywordRecognizer not found" Error
 
-**Solution 1: Change API Compatibility**
-- Set API Compatibility Level to **.NET Framework** (see Step 3 above)
-
-**Solution 2: Add Assembly Reference**
-- Create `Assets/mcs.rsp` with: `-r:System.Speech.dll`
-- Restart Unity
-
-**Solution 3: Use Alternative Library**
-- Consider using a Unity-compatible speech recognition plugin
-- Or use Windows Runtime APIs (requires UWP build)
+**Solution:** Make sure you're building for Windows Standalone (not UWP)
+- In Build Settings, select **PC, Mac & Linux Standalone**
+- Platform should be **Windows**
+- The `KeywordRecognizer` is only available in Windows Standalone builds
 
 ### Microphone Not Working
 
@@ -104,7 +108,8 @@ Before testing, ensure Windows Speech Recognition is enabled:
    - Settings → System → Sound → Test your microphone
 
 4. **Check Console Logs**:
-   - Look for "Windows Speech Recognition initialized successfully"
+   - Look for "Windows Speech Recognition initialized with X keywords"
+   - Look for "Windows Speech Recognition started - speak a country name"
    - If you see errors, check the specific error message
 
 ### Speech Not Recognized

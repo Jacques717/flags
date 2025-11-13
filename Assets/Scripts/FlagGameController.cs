@@ -21,6 +21,7 @@ public class FlagGameController : MonoBehaviour
     private int totalQuestions = 10;
     private bool waitingForAnswer = false;
     private bool questionAnswered = false;
+    private string lastRecognizedText = null; // Store what was recognized
     
     private void Start()
     {
@@ -151,6 +152,7 @@ public class FlagGameController : MonoBehaviour
         currentQuestion = currentGameFlags[currentQuestionIndex];
         questionAnswered = false;
         waitingForAnswer = true;
+        lastRecognizedText = null; // Reset recognized text for new question
         
         Debug.Log($"StartNextQuestion: Question {currentQuestionIndex + 1}, Country: {currentQuestion.countryName}, Sprite: {(currentQuestion.flagSprite != null ? "LOADED" : "NULL")}");
         
@@ -187,12 +189,16 @@ public class FlagGameController : MonoBehaviour
         if (!waitingForAnswer || questionAnswered)
             return;
         
-        Debug.Log($"Speech recognized: {recognizedText}");
+        Debug.Log($"=== SPEECH RECOGNIZED ===\nRecognized: '{recognizedText}'\nCurrent Question: {currentQuestion.countryName}\nAccepted Answers: {string.Join(", ", currentQuestion.acceptedAnswers)}");
+        
+        // Store what was recognized
+        lastRecognizedText = recognizedText;
         
         // Check if answer is correct
         bool isCorrect = AnswerMatcher.IsAnswerCorrect(recognizedText, currentQuestion);
+        Debug.Log($"=== ANSWER CHECK ===\nRecognized: '{recognizedText}'\nQuestion: '{currentQuestion.countryName}'\nResult: {(isCorrect ? "CORRECT" : "WRONG")}");
         
-        HandleAnswer(isCorrect);
+        HandleAnswer(isCorrect, recognizedText);
     }
     
     private void OnSpeechError(string error)
@@ -207,16 +213,19 @@ public class FlagGameController : MonoBehaviour
             return;
         
         Debug.Log("Time expired!");
-        HandleAnswer(false);
+        lastRecognizedText = null; // No recognition on timeout
+        HandleAnswer(false, null);
     }
     
-    private void HandleAnswer(bool isCorrect)
+    private void HandleAnswer(bool isCorrect, string recognizedText)
     {
         if (questionAnswered)
             return;
         
         questionAnswered = true;
         waitingForAnswer = false;
+        
+        Debug.Log($"HandleAnswer called with isCorrect={isCorrect} for country: {currentQuestion.countryName}, recognized: {recognizedText ?? "none"}");
         
         // Stop timer and speech recognition
         if (timer != null)
@@ -235,10 +244,11 @@ public class FlagGameController : MonoBehaviour
             GameManager.Instance.OnQuestionAnswered(isCorrect);
         }
         
-        // Show feedback
+        // Show feedback with recognized text
         if (uiManager != null)
         {
-            uiManager.ShowAnswerFeedback(isCorrect, currentQuestion.countryName);
+            uiManager.ShowAnswerFeedback(isCorrect, currentQuestion.countryName, recognizedText);
+            Debug.Log($"ShowAnswerFeedback called with isCorrect={isCorrect}, recognized: {recognizedText ?? "none"}");
         }
         
         // Move to next question after delay

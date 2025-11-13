@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text timerText;
     [SerializeField] private Text scoreText;
     [SerializeField] private Text listeningText;
+    [SerializeField] private Image microphoneVolumeIndicator; // Visual indicator for mic input
     
     [Header("Feedback UI")]
     [SerializeField] private GameObject feedbackPanel;
@@ -87,6 +88,25 @@ public class UIManager : MonoBehaviour
                 GameObject found = FindGameObjectInScene("FlagImage");
                 if (found != null)
                     flagImage = found.GetComponent<Image>();
+            }
+            
+            if (microphoneVolumeIndicator == null)
+            {
+                GameObject found = FindGameObjectInScene("MicrophoneVolumeIndicator");
+                if (found != null)
+                    microphoneVolumeIndicator = found.GetComponent<Image>();
+            }
+            
+            if (feedbackPanel == null)
+            {
+                feedbackPanel = FindGameObjectInScene("FeedbackPanel");
+            }
+            
+            if (feedbackText == null && feedbackPanel != null)
+            {
+                GameObject found = FindGameObjectInScene("FeedbackText");
+                if (found != null)
+                    feedbackText = found.GetComponent<Text>();
             }
         }
     }
@@ -272,8 +292,21 @@ public class UIManager : MonoBehaviour
         
         if (listeningText != null)
         {
-            listeningText.text = "Listening...";
+            listeningText.text = "🎤 Listening... Say a country name";
             listeningText.gameObject.SetActive(true);
+            // Ensure text fits - make it wider if needed
+            RectTransform textRect = listeningText.GetComponent<RectTransform>();
+            if (textRect != null && textRect.sizeDelta.x < 400)
+            {
+                textRect.sizeDelta = new Vector2(400, textRect.sizeDelta.y);
+            }
+        }
+        
+        // Show microphone volume indicator
+        if (microphoneVolumeIndicator != null)
+        {
+            microphoneVolumeIndicator.gameObject.SetActive(true);
+            isMicrophoneActive = true;
         }
         
         // Hide feedback
@@ -297,30 +330,133 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    public void ShowAnswerFeedback(bool isCorrect, string correctAnswer)
+    public void ShowAnswerFeedback(bool isCorrect, string correctAnswer, string recognizedText = null)
     {
+        Debug.Log($"ShowAnswerFeedback: isCorrect={isCorrect}, correctAnswer={correctAnswer}, recognizedText={recognizedText ?? "null"}");
+        
+        // ALWAYS show what was recognized - make it very visible
+        string displayText = "";
+        
+        if (isCorrect)
+        {
+            // Always show what was recognized, even when correct
+            if (!string.IsNullOrEmpty(recognizedText))
+            {
+                displayText = $"✓ CORRECT!\nYou said: \"{recognizedText}\"\nAnswer: {correctAnswer}";
+            }
+            else
+            {
+                displayText = $"✓ CORRECT!\nAnswer: {correctAnswer}";
+            }
+        }
+        else
+        {
+            // Show what was recognized (if available) with red X
+            if (!string.IsNullOrEmpty(recognizedText))
+            {
+                displayText = $"✗ WRONG!\nYou said: \"{recognizedText}\"\nCorrect answer: {correctAnswer}";
+            }
+            else
+            {
+                // Time expired or no recognition
+                displayText = $"✗ TIME EXPIRED!\nCorrect answer: {correctAnswer}";
+            }
+        }
+        
+        // Show in UI
         if (feedbackPanel != null)
         {
-            feedbackPanel.SetActive(true);
+            // CRITICAL: Ensure parent is active first!
+            Transform parent = feedbackPanel.transform.parent;
+            if (parent != null && !parent.gameObject.activeSelf)
+            {
+                Debug.LogWarning($"=== PARENT WAS INACTIVE! ===\nParent: {parent.name}, activating now...");
+                parent.gameObject.SetActive(true);
+            }
             
+            feedbackPanel.SetActive(true);
+            Debug.Log($"=== SHOWING FEEDBACK ===\nPanel active: {feedbackPanel.activeSelf}\nParent active: {(parent != null ? parent.gameObject.activeSelf.ToString() : "null")}\nDisplay text: {displayText}");
+            
+            // Make sure panel is visible and on top
+            feedbackPanel.transform.SetAsLastSibling();
+            
+            // Ensure panel is visible (check Canvas)
+            Canvas canvas = feedbackPanel.GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                Debug.Log($"Canvas found: {canvas.name}, enabled: {canvas.enabled}");
+                if (!canvas.enabled)
+                {
+                    canvas.enabled = true;
+                    Debug.LogWarning("Canvas was disabled! Enabled it.");
+                }
+            }
+            
+            // Find ALL text components in the feedback panel and update them
+            Text[] allTextsInPanel = feedbackPanel.GetComponentsInChildren<Text>(true);
+            Debug.Log($"=== FOUND {allTextsInPanel.Length} TEXT COMPONENTS IN FEEDBACK PANEL ===");
+            
+            foreach (Text text in allTextsInPanel)
+            {
+                Debug.Log($"Updating Text component: {text.gameObject.name}, current text: '{text.text}'");
+                text.text = displayText;
+                text.color = isCorrect ? correctColor : incorrectColor;
+                text.fontSize = 24;
+                text.gameObject.SetActive(true);
+                
+                // Ensure parent is active
+                if (text.transform.parent != null && !text.transform.parent.gameObject.activeSelf)
+                {
+                    text.transform.parent.gameObject.SetActive(true);
+                }
+            }
+            
+            // Also update the main feedbackText reference if it exists
             if (feedbackText != null)
             {
-                if (isCorrect)
+                feedbackText.text = displayText;
+                feedbackText.color = isCorrect ? correctColor : incorrectColor;
+                feedbackText.fontSize = 24;
+                feedbackText.gameObject.SetActive(true);
+                
+                Debug.Log($"=== MAIN FEEDBACK TEXT UPDATED ===\nText: '{feedbackText.text}'\nText visible: {feedbackText.gameObject.activeSelf}\nParent active: {feedbackText.transform.parent.gameObject.activeSelf}\nColor: {feedbackText.color}");
+            }
+            else
+            {
+                // If main reference is null, try to find and assign it
+                if (allTextsInPanel.Length > 0)
                 {
-                    feedbackText.text = "Correct!";
-                    feedbackText.color = correctColor;
+                    feedbackText = allTextsInPanel[0];
+                    Debug.Log($"Assigned first text component to feedbackText: {feedbackText.gameObject.name}");
                 }
                 else
                 {
-                    feedbackText.text = $"Incorrect! The answer was: {correctAnswer}";
-                    feedbackText.color = incorrectColor;
+                    Debug.LogError("=== ERROR: No text components found in feedback panel! ===");
                 }
             }
+        }
+        else
+        {
+            Debug.LogError("=== ERROR: feedbackPanel is null! Cannot show feedback. ===");
         }
         
         if (listeningText != null)
         {
             listeningText.gameObject.SetActive(false);
+        }
+        
+        // Hide microphone volume indicator
+        if (microphoneVolumeIndicator != null)
+        {
+            microphoneVolumeIndicator.gameObject.SetActive(false);
+        }
+        
+        // Stop microphone when not listening
+        if (microphoneClip != null && !string.IsNullOrEmpty(microphoneDevice))
+        {
+            Microphone.End(microphoneDevice);
+            microphoneClip = null;
+            isMicrophoneActive = false;
         }
     }
     
@@ -359,8 +495,20 @@ public class UIManager : MonoBehaviour
         ShowGameUI();
     }
     
+    private AudioClip microphoneClip;
+    private string microphoneDevice;
+    private int microphoneSampleRate = 44100;
+    private int lastMicrophonePosition = 0;
+    private bool isMicrophoneActive = false;
+    
     private void Update()
     {
+        // Update microphone volume indicator
+        if (isMicrophoneActive)
+        {
+            UpdateMicrophoneVolume();
+        }
+        
         // Update timer display if game is in progress
         if (GameManager.Instance != null && GameManager.Instance.GameInProgress)
         {
@@ -372,6 +520,103 @@ public class UIManager : MonoBehaviour
             
             // Update score
             UpdateScore(GameManager.Instance.CurrentScore, GameManager.Instance.QuestionsPerGame);
+        }
+    }
+    
+    private void UpdateMicrophoneVolume()
+    {
+        if (microphoneVolumeIndicator == null || !microphoneVolumeIndicator.gameObject.activeSelf)
+            return;
+        
+        float volume = GetMicrophoneVolume();
+        
+        // Update visual indicator (scale or color based on volume)
+        if (microphoneVolumeIndicator != null)
+        {
+            // Change color from green (quiet) to red (loud)
+            Color indicatorColor = Color.Lerp(Color.green, Color.red, volume);
+            microphoneVolumeIndicator.color = indicatorColor;
+            
+            // Scale the indicator based on volume (0.5 to 1.5 scale)
+            RectTransform rect = microphoneVolumeIndicator.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                float scale = 0.5f + (volume * 1.0f); // Scale from 0.5 to 1.5
+                rect.localScale = new Vector3(scale, scale, 1f);
+            }
+        }
+    }
+    
+    private float GetMicrophoneVolume()
+    {
+        if (microphoneClip == null)
+        {
+            // Start microphone recording
+            if (Microphone.devices.Length > 0)
+            {
+                try
+                {
+                    microphoneDevice = Microphone.devices[0];
+                    microphoneClip = Microphone.Start(microphoneDevice, true, 1, microphoneSampleRate);
+                    lastMicrophonePosition = 0;
+                    isMicrophoneActive = true;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"Failed to start microphone: {e.Message}");
+                    isMicrophoneActive = false;
+                    return 0f;
+                }
+            }
+            else
+            {
+                isMicrophoneActive = false;
+                return 0f;
+            }
+        }
+        
+        if (microphoneClip == null || !isMicrophoneActive)
+            return 0f;
+        
+        int currentPosition = Microphone.GetPosition(microphoneDevice);
+        if (currentPosition < 0 || microphoneDevice == null)
+            return 0f;
+        
+        // Get audio data
+        int samplesToRead = currentPosition - lastMicrophonePosition;
+        if (samplesToRead < 0)
+            samplesToRead += microphoneClip.samples;
+        
+        if (samplesToRead > 0)
+        {
+            float[] samples = new float[samplesToRead];
+            microphoneClip.GetData(samples, lastMicrophonePosition);
+            
+            // Calculate RMS (Root Mean Square) for volume
+            float sum = 0f;
+            for (int i = 0; i < samples.Length; i++)
+            {
+                sum += samples[i] * samples[i];
+            }
+            float rms = Mathf.Sqrt(sum / samples.Length);
+            
+            // Normalize to 0-1 range and amplify
+            float volume = Mathf.Clamp01(rms * 10f);
+            
+            lastMicrophonePosition = currentPosition;
+            return volume;
+        }
+        
+        return 0f;
+    }
+    
+    private void OnDestroy()
+    {
+        // Stop microphone when done
+        if (microphoneClip != null && !string.IsNullOrEmpty(microphoneDevice))
+        {
+            Microphone.End(microphoneDevice);
+            isMicrophoneActive = false;
         }
     }
 }

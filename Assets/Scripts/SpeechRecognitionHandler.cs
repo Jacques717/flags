@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+using UnityEngine.Windows.Speech;
+#endif
 
 public class SpeechRecognitionHandler : MonoBehaviour
 {
@@ -26,14 +31,29 @@ public class SpeechRecognitionHandler : MonoBehaviour
     private AndroidJavaObject recognitionListener;
 #elif UNITY_IOS && !UNITY_EDITOR
     // iOS speech recognition will be implemented via native plugin
-#elif UNITY_STANDALONE_WIN || UNITY_WSA
-    // Windows: Using keyboard input fallback (System.Speech not available in Unity 6)
-    // For real speech recognition, integrate UnitySpeechToText plugin
+#elif UNITY_STANDALONE_WIN && !UNITY_EDITOR
+    // Windows: Using Unity's built-in KeywordRecognizer
+    private KeywordRecognizer keywordRecognizer;
+    private Dictionary<string, System.Action> keywordActions;
 #endif
     
     private void Start()
     {
         InitializeSpeechRecognition();
+    }
+    
+    private void OnDestroy()
+    {
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        if (keywordRecognizer != null)
+        {
+            if (keywordRecognizer.IsRunning)
+            {
+                keywordRecognizer.Stop();
+            }
+            keywordRecognizer.Dispose();
+        }
+#endif
     }
     
     private void InitializeSpeechRecognition()
@@ -46,11 +66,8 @@ public class SpeechRecognitionHandler : MonoBehaviour
         InitializeAndroidSpeechRecognition();
 #elif UNITY_IOS && !UNITY_EDITOR
         InitializeIOSSpeechRecognition();
-#elif UNITY_STANDALONE_WIN || UNITY_WSA
-        // Windows: Use keyboard input as fallback (System.Speech not available in Unity 6)
-        // TODO: Integrate UnitySpeechToText plugin for real speech recognition
-        isInitialized = true;
-        Debug.Log("Speech Recognition: Using keyboard input mode on Windows (speech recognition requires plugin)");
+#elif UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        InitializeWindowsSpeechRecognition();
 #else
         Debug.LogWarning("Speech recognition not supported on this platform");
         isInitialized = false;
@@ -103,6 +120,121 @@ public class SpeechRecognitionHandler : MonoBehaviour
         isInitialized = false;
         Debug.LogWarning("iOS speech recognition not yet implemented - requires native plugin");
     }
+#elif UNITY_STANDALONE_WIN && !UNITY_EDITOR
+    private void InitializeWindowsSpeechRecognition()
+    {
+        try
+        {
+            // Create list of keywords (country names and variations)
+            List<string> keywords = new List<string>
+            {
+                "United States", "United Kingdom", "France", "Germany", "Japan",
+                "Canada", "Australia", "Brazil", "India", "Italy",
+                "USA", "US", "America", "UK", "Britain", "England", "Britannia",
+                "Deutschland", "Brasil", "Italia"
+            };
+            
+            // Create keyword actions dictionary
+            keywordActions = new Dictionary<string, System.Action>();
+            foreach (string keyword in keywords)
+            {
+                string capturedKeyword = keyword; // Capture for closure
+                keywordActions[keyword] = () => OnWindowsKeywordRecognized(capturedKeyword);
+            }
+            
+            // Create KeywordRecognizer
+            keywordRecognizer = new KeywordRecognizer(keywords.ToArray());
+            keywordRecognizer.OnPhraseRecognized += OnWindowsPhraseRecognized;
+            
+            isInitialized = true;
+            Debug.Log($"Windows Speech Recognition initialized with {keywords.Count} keywords");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to initialize Windows speech recognition: {e.Message}");
+            Debug.LogWarning("Make sure microphone permissions are granted in Windows Settings");
+            isInitialized = false;
+        }
+    }
+    
+    private void OnWindowsPhraseRecognized(PhraseRecognizedEventArgs args)
+    {
+        string recognizedPhrase = args.text?.Trim() ?? "";
+        
+        Debug.Log($"=== WINDOWS SPEECH RECOGNITION ===\nRecognized: '{recognizedPhrase}'\nConfidence: {args.confidence}");
+        
+        // Always invoke the recognized text so the game can display it and check if it's correct
+        // The game logic will determine if it matches the current question
+        if (keywordActions.ContainsKey(recognizedPhrase))
+        {
+            Debug.Log($"Recognized phrase '{recognizedPhrase}' is in keyword list - invoking");
+            keywordActions[recognizedPhrase].Invoke();
+        }
+        else
+        {
+            Debug.LogWarning($"Recognized phrase '{recognizedPhrase}' NOT in keyword list - but still reporting to game");
+            // Still report it so user can see what was heard and game can check if it matches
+            OnSpeechRecognized?.Invoke(recognizedPhrase);
+            isRecording = false;
+            OnSpeechStopped?.Invoke();
+        }
+    }
+    
+    private void OnWindowsKeywordRecognized(string recognizedText)
+    {
+        Debug.Log($"OnWindowsKeywordRecognized called with: '{recognizedText}'");
+        OnSpeechRecognized?.Invoke(recognizedText);
+        isRecording = false;
+        OnSpeechStopped?.Invoke();
+    }
+    
+    private void StartWindowsListening()
+    {
+        try
+        {
+            if (keywordRecognizer == null)
+            {
+                Debug.LogError("KeywordRecognizer is null! Speech recognition not initialized.");
+                OnSpeechError?.Invoke("Speech recognition not initialized");
+                isRecording = false;
+                return;
+            }
+            
+            if (!keywordRecognizer.IsRunning)
+            {
+                keywordRecognizer.Start();
+                Debug.Log("Windows Speech Recognition started - speak a country name");
+                Debug.Log($"KeywordRecognizer is running: {keywordRecognizer.IsRunning}");
+                Debug.Log("Ready to recognize: United States, USA, US, America, United Kingdom, UK, Britain, England, France, Germany, Japan, Canada, Australia, Brazil, India, Italy");
+            }
+            else
+            {
+                Debug.LogWarning("KeywordRecognizer is already running");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to start Windows listening: {e.Message}");
+            Debug.LogError($"Exception details: {e}");
+            OnSpeechError?.Invoke(e.Message);
+            isRecording = false;
+        }
+    }
+    
+    private void StopWindowsListening()
+    {
+        try
+        {
+            if (keywordRecognizer != null && keywordRecognizer.IsRunning)
+            {
+                keywordRecognizer.Stop();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to stop Windows listening: {e.Message}");
+        }
+    }
 #endif
     
     public void StartListening()
@@ -130,9 +262,8 @@ public class SpeechRecognitionHandler : MonoBehaviour
         StartAndroidListening();
 #elif UNITY_IOS && !UNITY_EDITOR
         StartIOSListening();
-#elif UNITY_STANDALONE_WIN || UNITY_WSA
-        // Windows: Use keyboard input (same as editor)
-        StartKeyboardInput();
+#elif UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        StartWindowsListening();
 #endif
     }
     
@@ -150,9 +281,8 @@ public class SpeechRecognitionHandler : MonoBehaviour
         }
 #elif UNITY_IOS && !UNITY_EDITOR
         // Stop iOS listening
-#elif UNITY_STANDALONE_WIN || UNITY_WSA
-        // Windows: Keyboard input doesn't need explicit stop
-        waitingForKeyboardInput = false;
+#elif UNITY_STANDALONE_WIN && !UNITY_EDITOR
+        StopWindowsListening();
 #endif
     }
     

@@ -539,16 +539,32 @@ public class SceneSetupHelper : EditorWindow
             listeningText = new GameObject("ListeningText");
             listeningText.transform.SetParent(gamePanel.transform, false);
             UnityEngine.UI.Text text = listeningText.AddComponent<UnityEngine.UI.Text>();
-            text.text = "Listening...";
+            text.text = "🎤 Listening... Say a country name";
             // Font will use Unity's default (Unity 6 doesn't require explicit font assignment)
-            text.fontSize = 20;
+            text.fontSize = 24;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = Color.cyan;
             RectTransform textRect = listeningText.GetComponent<RectTransform>();
-            textRect.anchorMin = new Vector2(0.5f, 0.2f);
-            textRect.anchorMax = new Vector2(0.5f, 0.2f);
+            textRect.anchorMin = new Vector2(0.5f, 0.15f);
+            textRect.anchorMax = new Vector2(0.5f, 0.15f);
             textRect.anchoredPosition = Vector2.zero;
-            textRect.sizeDelta = new Vector2(200, 30);
+            textRect.sizeDelta = new Vector2(400, 40); // Wider to fit full text
+        }
+        
+        // Create Microphone Volume Indicator
+        GameObject micIndicator = GameObject.Find("MicrophoneVolumeIndicator");
+        if (micIndicator == null)
+        {
+            micIndicator = new GameObject("MicrophoneVolumeIndicator");
+            micIndicator.transform.SetParent(gamePanel.transform, false);
+            UnityEngine.UI.Image micImage = micIndicator.AddComponent<UnityEngine.UI.Image>();
+            micImage.color = Color.green;
+            RectTransform micRect = micIndicator.GetComponent<RectTransform>();
+            micRect.anchorMin = new Vector2(0.5f, 0.08f);
+            micRect.anchorMax = new Vector2(0.5f, 0.08f);
+            micRect.anchoredPosition = Vector2.zero;
+            micRect.sizeDelta = new Vector2(60, 60);
+            micIndicator.SetActive(false);
         }
         
         // Create Feedback Panel
@@ -563,7 +579,7 @@ public class SceneSetupHelper : EditorWindow
             panelRect.anchorMin = new Vector2(0.5f, 0.1f);
             panelRect.anchorMax = new Vector2(0.5f, 0.1f);
             panelRect.anchoredPosition = Vector2.zero;
-            panelRect.sizeDelta = new Vector2(400, 80);
+            panelRect.sizeDelta = new Vector2(600, 120); // Larger to fit more text
             feedbackPanel.SetActive(false);
             
             // Feedback Text
@@ -572,13 +588,15 @@ public class SceneSetupHelper : EditorWindow
             UnityEngine.UI.Text feedbackText = feedbackTextObj.AddComponent<UnityEngine.UI.Text>();
             feedbackText.text = "Correct!";
             // Font will use Unity's default (Unity 6 doesn't require explicit font assignment)
-            feedbackText.fontSize = 32;
+            feedbackText.fontSize = 28; // Slightly smaller to fit more text
             feedbackText.alignment = TextAnchor.MiddleCenter;
             feedbackText.color = Color.green;
             RectTransform feedbackRect = feedbackTextObj.GetComponent<RectTransform>();
             feedbackRect.anchorMin = Vector2.zero;
             feedbackRect.anchorMax = Vector2.one;
             feedbackRect.sizeDelta = Vector2.zero;
+            feedbackRect.offsetMin = new Vector2(10, 10); // Padding
+            feedbackRect.offsetMax = new Vector2(-10, -10);
         }
         
         // Create Score Screen Panel
@@ -675,6 +693,7 @@ public class SceneSetupHelper : EditorWindow
                 System.Reflection.FieldInfo timerTextField = typeof(UIManager).GetField("timerText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo scoreTextField = typeof(UIManager).GetField("scoreText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo listeningTextField = typeof(UIManager).GetField("listeningText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                System.Reflection.FieldInfo micIndicatorField = typeof(UIManager).GetField("microphoneVolumeIndicator", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo feedbackPanelField = typeof(UIManager).GetField("feedbackPanel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo feedbackTextField = typeof(UIManager).GetField("feedbackText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo scoreScreenPanelField = typeof(UIManager).GetField("scoreScreenPanel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -688,6 +707,7 @@ public class SceneSetupHelper : EditorWindow
                 if (timerTextField != null) timerTextField.SetValue(uiManager, timerText.GetComponent<UnityEngine.UI.Text>());
                 if (scoreTextField != null) scoreTextField.SetValue(uiManager, scoreText.GetComponent<UnityEngine.UI.Text>());
                 if (listeningTextField != null) listeningTextField.SetValue(uiManager, listeningText.GetComponent<UnityEngine.UI.Text>());
+                if (micIndicatorField != null) micIndicatorField.SetValue(uiManager, GameObject.Find("MicrophoneVolumeIndicator")?.GetComponent<UnityEngine.UI.Image>());
                 if (feedbackPanelField != null) feedbackPanelField.SetValue(uiManager, feedbackPanel);
                 if (feedbackTextField != null) feedbackTextField.SetValue(uiManager, GameObject.Find("FeedbackText")?.GetComponent<UnityEngine.UI.Text>());
                 if (scoreScreenPanelField != null) scoreScreenPanelField.SetValue(uiManager, scoreScreenPanel);

@@ -22,16 +22,43 @@ public static class AnswerMatcher
             
             // Exact match
             if (normalizedSpoken == normalizedAccepted)
+            {
+                Debug.Log($"AnswerMatcher: Exact match! '{spokenAnswer}' == '{acceptedAnswer}'");
                 return true;
+            }
             
-            // Contains match (e.g., "united states" contains "usa" or vice versa)
-            if (normalizedSpoken.Contains(normalizedAccepted) || normalizedAccepted.Contains(normalizedSpoken))
+            // Contains match - but only if one is a short abbreviation (2-3 chars) and the other is the full name
+            // This prevents false positives like "france" matching "canada" because both contain "an"
+            bool isShortAbbrev = normalizedAccepted.Length <= 3 || normalizedSpoken.Length <= 3;
+            if (isShortAbbrev && (normalizedSpoken.Contains(normalizedAccepted) || normalizedAccepted.Contains(normalizedSpoken)))
+            {
+                Debug.Log($"AnswerMatcher: Abbreviation match! '{spokenAnswer}' contains '{acceptedAnswer}' or vice versa");
                 return true;
+            }
             
-            // Fuzzy match using Levenshtein distance
-            if (LevenshteinDistance(normalizedSpoken, normalizedAccepted) <= 2)
+            // Fuzzy match using Levenshtein distance (only for similar length strings)
+            // Make it stricter - only allow 1-2 character differences for very similar words
+            int lengthDiff = Mathf.Abs(normalizedSpoken.Length - normalizedAccepted.Length);
+            int distance = LevenshteinDistance(normalizedSpoken, normalizedAccepted);
+            
+            // Only fuzzy match if:
+            // 1. Length difference is small (max 2 chars)
+            // 2. Distance is very small (max 1 char difference)
+            // 3. Both strings are at least 4 chars (to avoid matching short words incorrectly)
+            if (lengthDiff <= 2 && distance <= 1 && normalizedSpoken.Length >= 4 && normalizedAccepted.Length >= 4)
+            {
+                Debug.Log($"AnswerMatcher: Fuzzy match! '{spokenAnswer}' similar to '{acceptedAnswer}' (distance: {distance})");
                 return true;
+            }
+            
+            // Log why it didn't match for debugging
+            if (distance <= 3)
+            {
+                Debug.Log($"AnswerMatcher: Close but no match - '{spokenAnswer}' vs '{acceptedAnswer}' (distance: {distance}, lengthDiff: {lengthDiff})");
+            }
         }
+        
+        Debug.Log($"AnswerMatcher: No match found for '{spokenAnswer}' against country '{question.countryName}'");
         
         return false;
     }
