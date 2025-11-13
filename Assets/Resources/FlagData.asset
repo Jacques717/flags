@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 461b790e1b103484e92e6778aa12499a, type: 3}
+  m_Name: FlagData
+  m_EditorClassIdentifier: Assembly-CSharp::FlagData
+  flags:
+  - countryName: United States
+    acceptedAnswers:
+    - united states
+    - usa
+    - america
+    - us
+    flagSprite: {fileID: 0}
+  - countryName: United Kingdom
+    acceptedAnswers:
+    - united kingdom
+    - uk
+    - britain
+    - england
+    flagSprite: {fileID: 0}
+  - countryName: France
+    acceptedAnswers:
+    - france
+    flagSprite: {fileID: 0}
+  - countryName: Germany
+    acceptedAnswers:
+    - germany
+    - deutschland
+    flagSprite: {fileID: 0}
+  - countryName: Japan
+    acceptedAnswers:
+    - japan
+    flagSprite: {fileID: 0}
+  - countryName: Canada
+    acceptedAnswers:
+    - canada
+    flagSprite: {fileID: 0}
+  - countryName: Australia
+    acceptedAnswers:
+    - australia
+    flagSprite: {fileID: 0}
+  - countryName: Brazil
+    acceptedAnswers:
+    - brazil
+    - brasil
+    flagSprite: {fileID: 0}
+  - countryName: India
+    acceptedAnswers:
+    - india
+    flagSprite: {fileID: 0}
+  - countryName: Italy
+    acceptedAnswers:
+    - italy
+    - italia
+    flagSprite: {fileID: 0}
