@@ -23,6 +23,24 @@ public class FlagGameController : MonoBehaviour
     private bool questionAnswered = false;
     private string lastRecognizedText = null; // Store what was recognized
     
+    // Track answers for summary
+    private List<QuestionResult> questionResults = new List<QuestionResult>();
+    
+    [System.Serializable]
+    public class QuestionResult
+    {
+        public string countryName;
+        public string recognizedText;
+        public bool isCorrect;
+        
+        public QuestionResult(string country, string recognized, bool correct)
+        {
+            countryName = country;
+            recognizedText = recognized;
+            isCorrect = correct;
+        }
+    }
+    
     private void Start()
     {
         InitializeComponents();
@@ -79,6 +97,7 @@ public class FlagGameController : MonoBehaviour
         totalQuestions = questionCount;
         currentQuestionIndex = 0;
         questionAnswered = false;
+        questionResults.Clear(); // Reset results for new game
         
         // Ensure GamePanel is visible
         if (uiManager != null)
@@ -227,6 +246,9 @@ public class FlagGameController : MonoBehaviour
         
         Debug.Log($"HandleAnswer called with isCorrect={isCorrect} for country: {currentQuestion.countryName}, recognized: {recognizedText ?? "none"}");
         
+        // Track this answer for summary
+        questionResults.Add(new QuestionResult(currentQuestion.countryName, recognizedText ?? "No answer", isCorrect));
+        
         // Stop timer and speech recognition
         if (timer != null)
         {
@@ -266,10 +288,23 @@ public class FlagGameController : MonoBehaviour
         }
         else
         {
-            // All questions answered
+            // All questions answered - show score screen with summary
+            Debug.Log($"=== GAME COMPLETE ===\nScore: {GameManager.Instance.CurrentScore}/{totalQuestions}\nResults count: {questionResults.Count}");
+            
+            // Log all results for debugging
+            foreach (var result in questionResults)
+            {
+                Debug.Log($"Result: {result.countryName} - {(result.isCorrect ? "CORRECT" : "WRONG")} (said: '{result.recognizedText}')");
+            }
+            
             if (uiManager != null)
             {
-                uiManager.ShowScoreScreen(GameManager.Instance.CurrentScore, totalQuestions);
+                uiManager.ShowScoreScreen(GameManager.Instance.CurrentScore, totalQuestions, questionResults);
+                Debug.Log($"ShowScoreScreen called with score: {GameManager.Instance.CurrentScore}/{totalQuestions}, results: {questionResults.Count}");
+            }
+            else
+            {
+                Debug.LogError("UIManager is null! Cannot show score screen.");
             }
         }
     }

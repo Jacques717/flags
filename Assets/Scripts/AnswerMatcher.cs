@@ -27,12 +27,26 @@ public static class AnswerMatcher
                 return true;
             }
             
-            // Contains match - but only if one is a short abbreviation (2-3 chars) and the other is the full name
-            // This prevents false positives like "france" matching "canada" because both contain "an"
-            bool isShortAbbrev = normalizedAccepted.Length <= 3 || normalizedSpoken.Length <= 3;
-            if (isShortAbbrev && (normalizedSpoken.Contains(normalizedAccepted) || normalizedAccepted.Contains(normalizedSpoken)))
+            // Contains match - but only if BOTH are short abbreviations (2-3 chars)
+            // Single characters should NOT match full words (e.g., "i" should not match "india")
+            // This prevents false positives like "i" matching "india" or "france" matching "canada"
+            bool bothAreShort = normalizedAccepted.Length <= 3 && normalizedSpoken.Length <= 3;
+            bool oneIsSingleChar = normalizedAccepted.Length == 1 || normalizedSpoken.Length == 1;
+            
+            // Only allow contains match if:
+            // 1. Both are short (2-3 chars) - e.g., "uk" matches "usa" if one contains the other
+            // 2. OR one is a single char AND the other is also a single char (e.g., "i" matches "i")
+            // But NOT if one is single char and the other is longer (e.g., "i" should NOT match "india")
+            if (bothAreShort && !oneIsSingleChar && (normalizedSpoken.Contains(normalizedAccepted) || normalizedAccepted.Contains(normalizedSpoken)))
             {
                 Debug.Log($"AnswerMatcher: Abbreviation match! '{spokenAnswer}' contains '{acceptedAnswer}' or vice versa");
+                return true;
+            }
+            
+            // Single character exact match only
+            if (normalizedSpoken.Length == 1 && normalizedAccepted.Length == 1 && normalizedSpoken == normalizedAccepted)
+            {
+                Debug.Log($"AnswerMatcher: Single character exact match! '{spokenAnswer}' == '{acceptedAnswer}'");
                 return true;
             }
             

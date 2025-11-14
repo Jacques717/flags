@@ -318,9 +318,10 @@ public class SpeechRecognitionHandler : MonoBehaviour
                         keyboardInput = keyboardInput.Substring(0, keyboardInput.Length - 1);
                     }
                 }
-                else
+                else if (c >= 32 && c <= 126) // Only printable ASCII characters
                 {
                     keyboardInput += c;
+                    Debug.Log($"Keyboard input: '{keyboardInput}' (added char: '{c}')");
                 }
             }
         }

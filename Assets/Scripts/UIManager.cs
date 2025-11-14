@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 // using TMPro; // Commented out - will use regular Text instead for now
 
 public class UIManager : MonoBehaviour
@@ -107,6 +108,18 @@ public class UIManager : MonoBehaviour
                 GameObject found = FindGameObjectInScene("FeedbackText");
                 if (found != null)
                     feedbackText = found.GetComponent<Text>();
+            }
+            
+            if (scoreScreenPanel == null)
+            {
+                scoreScreenPanel = FindGameObjectInScene("ScoreScreenPanel");
+            }
+            
+            if (finalScoreText == null)
+            {
+                GameObject found = FindGameObjectInScene("FinalScoreText");
+                if (found != null)
+                    finalScoreText = found.GetComponent<Text>();
             }
         }
     }
@@ -460,20 +473,260 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    public void ShowScoreScreen(int score, int total)
+    public void ShowScoreScreen(int score, int total, System.Collections.Generic.List<FlagGameController.QuestionResult> results = null, int player2Score = -1, System.Collections.Generic.List<FlagGameController.QuestionResult> player2Results = null)
     {
+        Debug.Log($"=== ShowScoreScreen called ===\nScore: {score}/{total}\nResults: {(results != null ? results.Count.ToString() : "null")}");
+        
         if (gamePanel != null)
             gamePanel.SetActive(false);
         
-        if (scoreScreenPanel != null)
+        if (scoreScreenPanel == null)
         {
-            scoreScreenPanel.SetActive(true);
-            
-            if (finalScoreText != null)
+            Debug.LogError("=== ERROR: scoreScreenPanel is null! ===");
+            // Try to find it
+            scoreScreenPanel = FindGameObjectInScene("ScoreScreenPanel");
+            if (scoreScreenPanel == null)
             {
-                float percentage = (float)score / total * 100f;
-                finalScoreText.text = $"Final Score: {score}/{total}\n{percentage:F0}%";
+                Debug.LogError("ScoreScreenPanel not found in scene!");
+                return;
             }
+        }
+        
+        scoreScreenPanel.SetActive(true);
+        Debug.Log($"ScoreScreenPanel activated: {scoreScreenPanel.activeSelf}");
+        
+        if (finalScoreText == null)
+        {
+            Debug.LogError("=== ERROR: finalScoreText is null! ===");
+            // Try to find it
+            GameObject found = FindGameObjectInScene("FinalScoreText");
+            if (found != null)
+            {
+                finalScoreText = found.GetComponent<Text>();
+                Debug.Log($"Found FinalScoreText: {finalScoreText != null}");
+            }
+            else
+            {
+                Debug.LogError("FinalScoreText not found in scene!");
+                return;
+            }
+        }
+        
+        if (finalScoreText != null)
+        {
+            bool isMultiplayer = player2Score >= 0;
+            string summaryText = "";
+            
+            if (isMultiplayer)
+            {
+                // Multiplayer mode - show both players' scores
+                float p1Percentage = total > 0 ? (float)score / total * 100f : 0f;
+                float p2Percentage = total > 0 ? (float)player2Score / total * 100f : 0f;
+                string winner = score > player2Score ? "Player 1 Wins!" : (player2Score > score ? "Player 2 Wins!" : "It's a Tie!");
+                
+                summaryText = $"=== MULTIPLAYER RESULTS ===\n\n";
+                summaryText += $"Player 1: {score}/{total} ({p1Percentage:F0}%)\n";
+                summaryText += $"Player 2: {player2Score}/{total} ({p2Percentage:F0}%)\n";
+                summaryText += $"\n{winner}\n";
+            }
+            else
+            {
+                // Single player mode
+                float percentage = total > 0 ? (float)score / total * 100f : 0f;
+                summaryText = $"Final Score: {score}/{total}\n{percentage:F0}%";
+            }
+            
+            Debug.Log($"Creating summary text. Results count: {(results != null ? results.Count.ToString() : "null")}, Multiplayer: {isMultiplayer}");
+            
+            // Add summary of correct/incorrect answers
+            if (isMultiplayer)
+            {
+                // Multiplayer summary - show both players
+                if (results != null && results.Count > 0)
+                {
+                    summaryText += "\n--- Player 1 Summary ---\n";
+                    
+                    var correctAnswers = results.Where(r => r.isCorrect).ToList();
+                    var incorrectAnswers = results.Where(r => !r.isCorrect).ToList();
+                    
+                    if (correctAnswers.Count > 0)
+                    {
+                        summaryText += $"✓ Correct ({correctAnswers.Count}): ";
+                        summaryText += string.Join(", ", correctAnswers.Select(r => r.countryName));
+                        summaryText += "\n";
+                    }
+                    
+                    if (incorrectAnswers.Count > 0)
+                    {
+                        summaryText += $"✗ Wrong ({incorrectAnswers.Count}): ";
+                        summaryText += string.Join(", ", incorrectAnswers.Select(r => r.countryName));
+                        summaryText += "\n";
+                    }
+                }
+                
+                if (player2Results != null && player2Results.Count > 0)
+                {
+                    summaryText += "\n--- Player 2 Summary ---\n";
+                    
+                    var correctAnswers = player2Results.Where(r => r.isCorrect).ToList();
+                    var incorrectAnswers = player2Results.Where(r => !r.isCorrect).ToList();
+                    
+                    if (correctAnswers.Count > 0)
+                    {
+                        summaryText += $"✓ Correct ({correctAnswers.Count}): ";
+                        summaryText += string.Join(", ", correctAnswers.Select(r => r.countryName));
+                        summaryText += "\n";
+                    }
+                    
+                    if (incorrectAnswers.Count > 0)
+                    {
+                        summaryText += $"✗ Wrong ({incorrectAnswers.Count}): ";
+                        summaryText += string.Join(", ", incorrectAnswers.Select(r => r.countryName));
+                        summaryText += "\n";
+                    }
+                }
+            }
+            else
+            {
+                // Single player summary - detailed list
+                if (results != null && results.Count > 0)
+                {
+                    summaryText += "\n--- Summary ---\n";
+                    
+                    // Show correct answers
+                    var correctAnswers = results.Where(r => r.isCorrect).ToList();
+                    if (correctAnswers.Count > 0)
+                    {
+                        summaryText += $"\n✓ Correct ({correctAnswers.Count}):\n";
+                        foreach (var result in correctAnswers)
+                        {
+                            summaryText += $"  • {result.countryName}";
+                            if (!string.IsNullOrEmpty(result.recognizedText))
+                                summaryText += $" (you said: \"{result.recognizedText}\")";
+                            summaryText += "\n";
+                        }
+                    }
+                    
+                    // Show incorrect answers
+                    var incorrectAnswers = results.Where(r => !r.isCorrect).ToList();
+                    if (incorrectAnswers.Count > 0)
+                    {
+                        summaryText += $"\n✗ Wrong ({incorrectAnswers.Count}):\n";
+                        foreach (var result in incorrectAnswers)
+                        {
+                            summaryText += $"  • {result.countryName}";
+                            if (!string.IsNullOrEmpty(result.recognizedText))
+                                summaryText += $" (you said: \"{result.recognizedText}\")";
+                            summaryText += "\n";
+                        }
+                    }
+                }
+            }
+            
+            Debug.Log($"=== SETTING FINAL SCORE TEXT ===\nText length: {summaryText.Length}\nFirst 200 chars: {summaryText.Substring(0, Mathf.Min(200, summaryText.Length))}");
+            
+            // Update ALL FinalScoreText components in the scene to prevent duplicates
+            Text[] allFinalScoreTexts = scoreScreenPanel.GetComponentsInChildren<Text>(true);
+            Debug.Log($"Found {allFinalScoreTexts.Length} Text components in ScoreScreenPanel");
+            
+            foreach (Text text in allFinalScoreTexts)
+            {
+                if (text.gameObject.name == "FinalScoreText" || text == finalScoreText)
+                {
+                    text.text = summaryText;
+                    // Apply the same layout settings to all
+                    RectTransform textRectComponent = text.GetComponent<RectTransform>();
+                    if (textRectComponent != null)
+                    {
+                        if ((results != null && results.Count > 0) || isMultiplayer)
+                        {
+                            text.fontSize = isMultiplayer ? 18 : 14; // Smaller font to fit more
+                            text.alignment = TextAnchor.UpperLeft; // Left align for better readability
+                            // Leave room for buttons at bottom (buttons at 0.15 and 0.05)
+                            textRectComponent.anchorMin = new Vector2(0.05f, 0.22f); // Start from 22% from bottom
+                            textRectComponent.anchorMax = new Vector2(0.95f, 0.98f); // Go almost to top
+                            textRectComponent.anchoredPosition = Vector2.zero;
+                            textRectComponent.sizeDelta = Vector2.zero;
+                            // Add padding
+                            textRectComponent.offsetMin = new Vector2(20, 20);
+                            textRectComponent.offsetMax = new Vector2(-20, -20);
+                        }
+                        else
+                        {
+                            // Center position for just score (no summary)
+                            text.fontSize = 48;
+                            text.alignment = TextAnchor.MiddleCenter;
+                            textRectComponent.anchorMin = new Vector2(0.5f, 0.6f);
+                            textRectComponent.anchorMax = new Vector2(0.5f, 0.6f);
+                            textRectComponent.anchoredPosition = Vector2.zero;
+                            textRectComponent.sizeDelta = new Vector2(400, 100);
+                        }
+                    }
+                    Debug.Log($"Updated FinalScoreText: {text.gameObject.name}");
+                }
+            }
+            
+            // Also update the main reference
+            finalScoreText.text = summaryText;
+            
+            // Verify it was set
+            string actualText = finalScoreText.text;
+            Debug.Log($"=== TEXT SET ===\nActual text length: {actualText.Length}\nFirst 200 chars: {actualText.Substring(0, Mathf.Min(200, actualText.Length))}\nMatch: {actualText == summaryText}");
+            
+            // Adjust text size and position based on content
+            RectTransform textRect = finalScoreText.GetComponent<RectTransform>();
+            if (textRect != null)
+            {
+                if ((results != null && results.Count > 0) || isMultiplayer)
+                {
+                    // Make text smaller and adjust position for summary
+                    // Leave room for buttons at the bottom (buttons are at 0.15 and 0.05, so we use 0.22 as min to leave more room)
+                    finalScoreText.fontSize = isMultiplayer ? 18 : 14; // Smaller font to fit more
+                    finalScoreText.alignment = TextAnchor.UpperLeft; // Left align for better readability
+                    // Make text area larger to fit summary, but leave bottom 22% for buttons
+                    textRect.anchorMin = new Vector2(0.05f, 0.22f); // Start from 22% from bottom
+                    textRect.anchorMax = new Vector2(0.95f, 0.98f); // Go almost to top
+                    textRect.anchoredPosition = Vector2.zero;
+                    textRect.sizeDelta = Vector2.zero;
+                    // Add padding
+                    textRect.offsetMin = new Vector2(20, 20);
+                    textRect.offsetMax = new Vector2(-20, -20);
+                    Debug.Log($"Text area expanded for summary. Rect: anchorMin={textRect.anchorMin}, anchorMax={textRect.anchorMax}, Multiplayer: {isMultiplayer}");
+                }
+                else
+                {
+                    // Center position for just score (no summary)
+                    finalScoreText.fontSize = 48;
+                    finalScoreText.alignment = TextAnchor.MiddleCenter;
+                    textRect.anchorMin = new Vector2(0.5f, 0.6f);
+                    textRect.anchorMax = new Vector2(0.5f, 0.6f);
+                    textRect.anchoredPosition = Vector2.zero;
+                    textRect.sizeDelta = new Vector2(400, 100);
+                    Debug.Log($"Text area centered for score only. Rect: anchorMin={textRect.anchorMin}, anchorMax={textRect.anchorMax}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("finalScoreText RectTransform is null!");
+                // Fallback: just adjust font size
+                if (results != null && results.Count > 5)
+                {
+                    finalScoreText.fontSize = 16;
+                }
+                else
+                {
+                    finalScoreText.fontSize = 20;
+                }
+            }
+            
+            // Ensure text is visible
+            finalScoreText.gameObject.SetActive(true);
+            if (finalScoreText.transform.parent != null)
+            {
+                finalScoreText.transform.parent.gameObject.SetActive(true);
+            }
+            
+            Debug.Log($"=== FINAL CHECK ===\nText visible: {finalScoreText.gameObject.activeSelf}\nParent active: {(finalScoreText.transform.parent != null ? finalScoreText.transform.parent.gameObject.activeSelf.ToString() : "null")}\nText component enabled: {finalScoreText.enabled}");
         }
     }
     

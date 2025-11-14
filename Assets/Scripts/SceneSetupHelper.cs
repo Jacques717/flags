@@ -635,8 +635,8 @@ public class SceneSetupHelper : EditorWindow
             UnityEngine.UI.Image returnButtonImage = returnToMenuButton.AddComponent<UnityEngine.UI.Image>();
             returnButtonImage.color = new Color(0.2f, 0.6f, 0.9f);
             RectTransform returnButtonRect = returnToMenuButton.GetComponent<RectTransform>();
-            returnButtonRect.anchorMin = new Vector2(0.5f, 0.4f);
-            returnButtonRect.anchorMax = new Vector2(0.5f, 0.4f);
+            returnButtonRect.anchorMin = new Vector2(0.5f, 0.15f);
+            returnButtonRect.anchorMax = new Vector2(0.5f, 0.15f);
             returnButtonRect.anchoredPosition = Vector2.zero;
             returnButtonRect.sizeDelta = new Vector2(200, 50);
             
@@ -660,8 +660,8 @@ public class SceneSetupHelper : EditorWindow
             UnityEngine.UI.Image playButtonImage = playAgainButton.AddComponent<UnityEngine.UI.Image>();
             playButtonImage.color = new Color(0.2f, 0.8f, 0.2f);
             RectTransform playButtonRect = playAgainButton.GetComponent<RectTransform>();
-            playButtonRect.anchorMin = new Vector2(0.5f, 0.3f);
-            playButtonRect.anchorMax = new Vector2(0.5f, 0.3f);
+            playButtonRect.anchorMin = new Vector2(0.5f, 0.05f);
+            playButtonRect.anchorMax = new Vector2(0.5f, 0.05f);
             playButtonRect.anchoredPosition = Vector2.zero;
             playButtonRect.sizeDelta = new Vector2(200, 50);
             

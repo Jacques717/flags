@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
         currentScore = 0;
         questionsAnswered = 0;
         gameInProgress = true;
+        Debug.Log($"Game started. Score reset to: {currentScore}/{questionsAnswered}");
         
         // Load appropriate game scene based on category
         switch (category)
@@ -119,23 +120,23 @@ public class GameManager : MonoBehaviour
         if (isCorrect)
         {
             currentScore++;
+            Debug.Log($"Score updated: {currentScore}/{questionsAnswered} (isCorrect: {isCorrect})");
+        }
+        else
+        {
+            Debug.Log($"Answer incorrect. Score: {currentScore}/{questionsAnswered}");
         }
         
-        // Check if game is complete
-        if (questionsAnswered >= questionsPerGame)
-        {
-            EndGame();
-        }
+        // Don't call EndGame here - let FlagGameController handle it when all questions are done
+        // This ensures the results list is passed correctly
     }
     
     private void EndGame()
     {
         gameInProgress = false;
-        // UIManager will handle showing the score screen
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.ShowScoreScreen(currentScore, questionsPerGame);
-        }
+        // This is now only called as a fallback
+        // FlagGameController should handle showing the score screen with results
+        Debug.Log($"EndGame called. Final score: {currentScore}/{questionsAnswered}");
     }
     
     public void ReturnToMenu()
