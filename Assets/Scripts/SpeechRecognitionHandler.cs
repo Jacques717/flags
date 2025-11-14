@@ -125,14 +125,31 @@ public class SpeechRecognitionHandler : MonoBehaviour
     {
         try
         {
-            // Create list of keywords (country names and variations)
-            List<string> keywords = new List<string>
+            // Create list of keywords from all countries and their accepted answers
+            List<string> keywords = new List<string>();
+            
+            // Add all country names and their accepted answers
+            foreach (var country in AllCountriesList.GetAllCountries())
             {
-                "United States", "United Kingdom", "France", "Germany", "Japan",
-                "Canada", "Australia", "Brazil", "India", "Italy",
-                "USA", "US", "America", "UK", "Britain", "England", "Britannia",
-                "Deutschland", "Brasil", "Italia"
-            };
+                // Add the country name
+                keywords.Add(country.countryName);
+                
+                // Add all accepted answers/variations
+                foreach (var answer in country.acceptedAnswers)
+                {
+                    // Capitalize first letter of each word for better recognition
+                    string capitalized = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(answer.ToLower());
+                    if (!keywords.Contains(capitalized))
+                    {
+                        keywords.Add(capitalized);
+                    }
+                    // Also add lowercase version
+                    if (!keywords.Contains(answer.ToLower()))
+                    {
+                        keywords.Add(answer.ToLower());
+                    }
+                }
+            }
             
             // Create keyword actions dictionary
             keywordActions = new Dictionary<string, System.Action>();

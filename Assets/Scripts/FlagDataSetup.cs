@@ -36,14 +36,19 @@ public class FlagDataSetup : EditorWindow
         
         if (existingData != null)
         {
+            int currentCount = existingData.flags != null ? existingData.flags.Count : 0;
             if (EditorUtility.DisplayDialog("Flag Data Exists", 
-                "FlagData asset already exists. Do you want to overwrite it?", 
-                "Yes", "No"))
+                $"FlagData asset already exists with {currentCount} flags.\n\nThis will update it with ALL countries from around the world (~195+ countries).\n\nDo you want to overwrite it?", 
+                "Yes, Update", "Cancel"))
             {
                 existingData.InitializeDefaultFlags();
                 EditorUtility.SetDirty(existingData);
                 AssetDatabase.SaveAssets();
-                Debug.Log("FlagData updated with default flags.");
+                int newCount = existingData.flags != null ? existingData.flags.Count : 0;
+                Debug.Log($"FlagData updated with {newCount} countries from around the world.");
+                EditorUtility.DisplayDialog("Update Complete", 
+                    $"FlagData has been updated!\n\nTotal countries: {newCount}\n\nThe game will now randomly select from all countries worldwide.", 
+                    "OK");
             }
         }
         else
@@ -62,8 +67,11 @@ public class FlagDataSetup : EditorWindow
             AssetDatabase.CreateAsset(newData, path);
             AssetDatabase.SaveAssets();
             
-            Debug.Log($"FlagData asset created at {path}");
-            EditorUtility.DisplayDialog("Success", "FlagData asset created successfully!", "OK");
+            int count = newData.flags != null ? newData.flags.Count : 0;
+            Debug.Log($"FlagData asset created at {path} with {count} countries");
+            EditorUtility.DisplayDialog("Success", 
+                $"FlagData asset created successfully!\n\nTotal countries: {count}\n\nThe game will now randomly select from all countries worldwide.", 
+                "OK");
         }
     }
 }

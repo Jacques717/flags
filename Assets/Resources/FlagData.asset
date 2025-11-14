@@ -19,6 +19,124 @@ MonoBehaviour:
     - usa
     - america
     - us
+    - united states of america
+    flagSprite: {fileID: 0}
+  - countryName: Canada
+    acceptedAnswers:
+    - canada
+    flagSprite: {fileID: 0}
+  - countryName: Mexico
+    acceptedAnswers:
+    - mexico
+    flagSprite: {fileID: 0}
+  - countryName: Cuba
+    acceptedAnswers:
+    - cuba
+    flagSprite: {fileID: 0}
+  - countryName: Jamaica
+    acceptedAnswers:
+    - jamaica
+    flagSprite: {fileID: 0}
+  - countryName: Haiti
+    acceptedAnswers:
+    - haiti
+    flagSprite: {fileID: 0}
+  - countryName: Dominican Republic
+    acceptedAnswers:
+    - dominican republic
+    - dominican
+    flagSprite: {fileID: 0}
+  - countryName: Guatemala
+    acceptedAnswers:
+    - guatemala
+    flagSprite: {fileID: 0}
+  - countryName: Honduras
+    acceptedAnswers:
+    - honduras
+    flagSprite: {fileID: 0}
+  - countryName: El Salvador
+    acceptedAnswers:
+    - el salvador
+    - salvador
+    flagSprite: {fileID: 0}
+  - countryName: Nicaragua
+    acceptedAnswers:
+    - nicaragua
+    flagSprite: {fileID: 0}
+  - countryName: Costa Rica
+    acceptedAnswers:
+    - costa rica
+    flagSprite: {fileID: 0}
+  - countryName: Panama
+    acceptedAnswers:
+    - panama
+    flagSprite: {fileID: 0}
+  - countryName: Belize
+    acceptedAnswers:
+    - belize
+    flagSprite: {fileID: 0}
+  - countryName: Trinidad and Tobago
+    acceptedAnswers:
+    - trinidad and tobago
+    - trinidad
+    - tobago
+    flagSprite: {fileID: 0}
+  - countryName: Barbados
+    acceptedAnswers:
+    - barbados
+    flagSprite: {fileID: 0}
+  - countryName: Bahamas
+    acceptedAnswers:
+    - bahamas
+    flagSprite: {fileID: 0}
+  - countryName: Brazil
+    acceptedAnswers:
+    - brazil
+    - brasil
+    flagSprite: {fileID: 0}
+  - countryName: Argentina
+    acceptedAnswers:
+    - argentina
+    flagSprite: {fileID: 0}
+  - countryName: Chile
+    acceptedAnswers:
+    - chile
+    flagSprite: {fileID: 0}
+  - countryName: Colombia
+    acceptedAnswers:
+    - colombia
+    flagSprite: {fileID: 0}
+  - countryName: Peru
+    acceptedAnswers:
+    - peru
+    flagSprite: {fileID: 0}
+  - countryName: Venezuela
+    acceptedAnswers:
+    - venezuela
+    flagSprite: {fileID: 0}
+  - countryName: Ecuador
+    acceptedAnswers:
+    - ecuador
+    flagSprite: {fileID: 0}
+  - countryName: Uruguay
+    acceptedAnswers:
+    - uruguay
+    flagSprite: {fileID: 0}
+  - countryName: Paraguay
+    acceptedAnswers:
+    - paraguay
+    flagSprite: {fileID: 0}
+  - countryName: Bolivia
+    acceptedAnswers:
+    - bolivia
+    flagSprite: {fileID: 0}
+  - countryName: Guyana
+    acceptedAnswers:
+    - guyana
+    flagSprite: {fileID: 0}
+  - countryName: Suriname
+    acceptedAnswers:
+    - suriname
     flagSprite: {fileID: 0}
   - countryName: United Kingdom
     acceptedAnswers:
@@ -26,6 +144,8 @@ MonoBehaviour:
     - uk
     - britain
     - england
+    - great britain
+    - britannia
     flagSprite: {fileID: 0}
   - countryName: France
     acceptedAnswers:
@@ -36,29 +156,636 @@ MonoBehaviour:
     - germany
     - deutschland
     flagSprite: {fileID: 0}
+  - countryName: Italy
+    acceptedAnswers:
+    - italy
+    - italia
+    flagSprite: {fileID: 0}
+  - countryName: Spain
+    acceptedAnswers:
+    - spain
+    - espana
+    flagSprite: {fileID: 0}
+  - countryName: Russia
+    acceptedAnswers:
+    - russia
+    - russian federation
+    flagSprite: {fileID: 0}
+  - countryName: Netherlands
+    acceptedAnswers:
+    - netherlands
+    - holland
+    flagSprite: {fileID: 0}
+  - countryName: Belgium
+    acceptedAnswers:
+    - belgium
+    - belgie
+    flagSprite: {fileID: 0}
+  - countryName: Switzerland
+    acceptedAnswers:
+    - switzerland
+    - schweiz
+    flagSprite: {fileID: 0}
+  - countryName: Austria
+    acceptedAnswers:
+    - austria
+    - osterreich
+    flagSprite: {fileID: 0}
+  - countryName: Sweden
+    acceptedAnswers:
+    - sweden
+    - sverige
+    flagSprite: {fileID: 0}
+  - countryName: Norway
+    acceptedAnswers:
+    - norway
+    - norge
+    flagSprite: {fileID: 0}
+  - countryName: Denmark
+    acceptedAnswers:
+    - denmark
+    - danmark
+    flagSprite: {fileID: 0}
+  - countryName: Finland
+    acceptedAnswers:
+    - finland
+    - suomi
+    flagSprite: {fileID: 0}
+  - countryName: Poland
+    acceptedAnswers:
+    - poland
+    - polska
+    flagSprite: {fileID: 0}
+  - countryName: Greece
+    acceptedAnswers:
+    - greece
+    - hellas
+    flagSprite: {fileID: 0}
+  - countryName: Portugal
+    acceptedAnswers:
+    - portugal
+    flagSprite: {fileID: 0}
+  - countryName: Ireland
+    acceptedAnswers:
+    - ireland
+    - eire
+    flagSprite: {fileID: 0}
+  - countryName: Czech Republic
+    acceptedAnswers:
+    - czech republic
+    - czechia
+    - czech
+    flagSprite: {fileID: 0}
+  - countryName: Romania
+    acceptedAnswers:
+    - romania
+    flagSprite: {fileID: 0}
+  - countryName: Hungary
+    acceptedAnswers:
+    - hungary
+    - magyarorszag
+    flagSprite: {fileID: 0}
+  - countryName: Bulgaria
+    acceptedAnswers:
+    - bulgaria
+    flagSprite: {fileID: 0}
+  - countryName: Croatia
+    acceptedAnswers:
+    - croatia
+    flagSprite: {fileID: 0}
+  - countryName: Serbia
+    acceptedAnswers:
+    - serbia
+    flagSprite: {fileID: 0}
+  - countryName: Slovakia
+    acceptedAnswers:
+    - slovakia
+    flagSprite: {fileID: 0}
+  - countryName: Slovenia
+    acceptedAnswers:
+    - slovenia
+    flagSprite: {fileID: 0}
+  - countryName: Lithuania
+    acceptedAnswers:
+    - lithuania
+    flagSprite: {fileID: 0}
+  - countryName: Latvia
+    acceptedAnswers:
+    - latvia
+    flagSprite: {fileID: 0}
+  - countryName: Estonia
+    acceptedAnswers:
+    - estonia
+    flagSprite: {fileID: 0}
+  - countryName: Luxembourg
+    acceptedAnswers:
+    - luxembourg
+    flagSprite: {fileID: 0}
+  - countryName: Iceland
+    acceptedAnswers:
+    - iceland
+    flagSprite: {fileID: 0}
+  - countryName: Malta
+    acceptedAnswers:
+    - malta
+    flagSprite: {fileID: 0}
+  - countryName: Cyprus
+    acceptedAnswers:
+    - cyprus
+    flagSprite: {fileID: 0}
+  - countryName: Albania
+    acceptedAnswers:
+    - albania
+    flagSprite: {fileID: 0}
+  - countryName: Macedonia
+    acceptedAnswers:
+    - macedonia
+    - north macedonia
+    flagSprite: {fileID: 0}
+  - countryName: Bosnia and Herzegovina
+    acceptedAnswers:
+    - bosnia and herzegovina
+    - bosnia
+    - herzegovina
+    flagSprite: {fileID: 0}
+  - countryName: Montenegro
+    acceptedAnswers:
+    - montenegro
+    flagSprite: {fileID: 0}
+  - countryName: Moldova
+    acceptedAnswers:
+    - moldova
+    flagSprite: {fileID: 0}
+  - countryName: Belarus
+    acceptedAnswers:
+    - belarus
+    - belorussia
+    flagSprite: {fileID: 0}
+  - countryName: Ukraine
+    acceptedAnswers:
+    - ukraine
+    flagSprite: {fileID: 0}
+  - countryName: Turkey
+    acceptedAnswers:
+    - turkey
+    - turkiye
+    flagSprite: {fileID: 0}
+  - countryName: China
+    acceptedAnswers:
+    - china
+    - peoples republic of china
+    - prc
+    flagSprite: {fileID: 0}
   - countryName: Japan
     acceptedAnswers:
     - japan
-    flagSprite: {fileID: 0}
-  - countryName: Canada
-    acceptedAnswers:
-    - canada
-    flagSprite: {fileID: 0}
-  - countryName: Australia
-    acceptedAnswers:
-    - australia
-    flagSprite: {fileID: 0}
-  - countryName: Brazil
-    acceptedAnswers:
-    - brazil
-    - brasil
     flagSprite: {fileID: 0}
   - countryName: India
     acceptedAnswers:
     - india
     flagSprite: {fileID: 0}
-  - countryName: Italy
+  - countryName: Indonesia
     acceptedAnswers:
-    - italy
-    - italia
+    - indonesia
+    flagSprite: {fileID: 0}
+  - countryName: Pakistan
+    acceptedAnswers:
+    - pakistan
+    flagSprite: {fileID: 0}
+  - countryName: Bangladesh
+    acceptedAnswers:
+    - bangladesh
+    flagSprite: {fileID: 0}
+  - countryName: Philippines
+    acceptedAnswers:
+    - philippines
+    - philippine
+    flagSprite: {fileID: 0}
+  - countryName: Vietnam
+    acceptedAnswers:
+    - vietnam
+    - viet nam
+    flagSprite: {fileID: 0}
+  - countryName: Thailand
+    acceptedAnswers:
+    - thailand
+    - siam
+    flagSprite: {fileID: 0}
+  - countryName: South Korea
+    acceptedAnswers:
+    - south korea
+    - korea
+    - republic of korea
+    - rok
+    flagSprite: {fileID: 0}
+  - countryName: Malaysia
+    acceptedAnswers:
+    - malaysia
+    flagSprite: {fileID: 0}
+  - countryName: Singapore
+    acceptedAnswers:
+    - singapore
+    flagSprite: {fileID: 0}
+  - countryName: Myanmar
+    acceptedAnswers:
+    - myanmar
+    - burma
+    flagSprite: {fileID: 0}
+  - countryName: Sri Lanka
+    acceptedAnswers:
+    - sri lanka
+    - ceylon
+    flagSprite: {fileID: 0}
+  - countryName: Nepal
+    acceptedAnswers:
+    - nepal
+    flagSprite: {fileID: 0}
+  - countryName: Afghanistan
+    acceptedAnswers:
+    - afghanistan
+    flagSprite: {fileID: 0}
+  - countryName: Iran
+    acceptedAnswers:
+    - iran
+    - persia
+    flagSprite: {fileID: 0}
+  - countryName: Iraq
+    acceptedAnswers:
+    - iraq
+    flagSprite: {fileID: 0}
+  - countryName: Saudi Arabia
+    acceptedAnswers:
+    - saudi arabia
+    - saudi
+    flagSprite: {fileID: 0}
+  - countryName: United Arab Emirates
+    acceptedAnswers:
+    - united arab emirates
+    - uae
+    - emirates
+    flagSprite: {fileID: 0}
+  - countryName: Israel
+    acceptedAnswers:
+    - israel
+    flagSprite: {fileID: 0}
+  - countryName: Jordan
+    acceptedAnswers:
+    - jordan
+    flagSprite: {fileID: 0}
+  - countryName: Lebanon
+    acceptedAnswers:
+    - lebanon
+    flagSprite: {fileID: 0}
+  - countryName: Syria
+    acceptedAnswers:
+    - syria
+    flagSprite: {fileID: 0}
+  - countryName: Yemen
+    acceptedAnswers:
+    - yemen
+    flagSprite: {fileID: 0}
+  - countryName: Oman
+    acceptedAnswers:
+    - oman
+    flagSprite: {fileID: 0}
+  - countryName: Kuwait
+    acceptedAnswers:
+    - kuwait
+    flagSprite: {fileID: 0}
+  - countryName: Qatar
+    acceptedAnswers:
+    - qatar
+    flagSprite: {fileID: 0}
+  - countryName: Bahrain
+    acceptedAnswers:
+    - bahrain
+    flagSprite: {fileID: 0}
+  - countryName: Kazakhstan
+    acceptedAnswers:
+    - kazakhstan
+    flagSprite: {fileID: 0}
+  - countryName: Uzbekistan
+    acceptedAnswers:
+    - uzbekistan
+    flagSprite: {fileID: 0}
+  - countryName: Kyrgyzstan
+    acceptedAnswers:
+    - kyrgyzstan
+    flagSprite: {fileID: 0}
+  - countryName: Tajikistan
+    acceptedAnswers:
+    - tajikistan
+    flagSprite: {fileID: 0}
+  - countryName: Turkmenistan
+    acceptedAnswers:
+    - turkmenistan
+    flagSprite: {fileID: 0}
+  - countryName: Mongolia
+    acceptedAnswers:
+    - mongolia
+    flagSprite: {fileID: 0}
+  - countryName: Cambodia
+    acceptedAnswers:
+    - cambodia
+    flagSprite: {fileID: 0}
+  - countryName: Laos
+    acceptedAnswers:
+    - laos
+    flagSprite: {fileID: 0}
+  - countryName: Brunei
+    acceptedAnswers:
+    - brunei
+    - brunei darussalam
+    flagSprite: {fileID: 0}
+  - countryName: East Timor
+    acceptedAnswers:
+    - east timor
+    - timor leste
+    flagSprite: {fileID: 0}
+  - countryName: Bhutan
+    acceptedAnswers:
+    - bhutan
+    flagSprite: {fileID: 0}
+  - countryName: Maldives
+    acceptedAnswers:
+    - maldives
+    flagSprite: {fileID: 0}
+  - countryName: South Africa
+    acceptedAnswers:
+    - south africa
+    flagSprite: {fileID: 0}
+  - countryName: Egypt
+    acceptedAnswers:
+    - egypt
+    - egyptian arab republic
+    flagSprite: {fileID: 0}
+  - countryName: Nigeria
+    acceptedAnswers:
+    - nigeria
+    flagSprite: {fileID: 0}
+  - countryName: Kenya
+    acceptedAnswers:
+    - kenya
+    flagSprite: {fileID: 0}
+  - countryName: Ethiopia
+    acceptedAnswers:
+    - ethiopia
+    flagSprite: {fileID: 0}
+  - countryName: Ghana
+    acceptedAnswers:
+    - ghana
+    flagSprite: {fileID: 0}
+  - countryName: Tanzania
+    acceptedAnswers:
+    - tanzania
+    flagSprite: {fileID: 0}
+  - countryName: Morocco
+    acceptedAnswers:
+    - morocco
+    - maroc
+    flagSprite: {fileID: 0}
+  - countryName: Algeria
+    acceptedAnswers:
+    - algeria
+    flagSprite: {fileID: 0}
+  - countryName: Sudan
+    acceptedAnswers:
+    - sudan
+    flagSprite: {fileID: 0}
+  - countryName: South Sudan
+    acceptedAnswers:
+    - south sudan
+    flagSprite: {fileID: 0}
+  - countryName: Uganda
+    acceptedAnswers:
+    - uganda
+    flagSprite: {fileID: 0}
+  - countryName: Angola
+    acceptedAnswers:
+    - angola
+    flagSprite: {fileID: 0}
+  - countryName: Mozambique
+    acceptedAnswers:
+    - mozambique
+    flagSprite: {fileID: 0}
+  - countryName: Madagascar
+    acceptedAnswers:
+    - madagascar
+    flagSprite: {fileID: 0}
+  - countryName: Cameroon
+    acceptedAnswers:
+    - cameroon
+    flagSprite: {fileID: 0}
+  - countryName: Ivory Coast
+    acceptedAnswers:
+    - ivory coast
+    - cote divoire
+    flagSprite: {fileID: 0}
+  - countryName: Niger
+    acceptedAnswers:
+    - niger
+    flagSprite: {fileID: 0}
+  - countryName: Mali
+    acceptedAnswers:
+    - mali
+    flagSprite: {fileID: 0}
+  - countryName: Burkina Faso
+    acceptedAnswers:
+    - burkina faso
+    flagSprite: {fileID: 0}
+  - countryName: Malawi
+    acceptedAnswers:
+    - malawi
+    flagSprite: {fileID: 0}
+  - countryName: Zambia
+    acceptedAnswers:
+    - zambia
+    flagSprite: {fileID: 0}
+  - countryName: Zimbabwe
+    acceptedAnswers:
+    - zimbabwe
+    flagSprite: {fileID: 0}
+  - countryName: Senegal
+    acceptedAnswers:
+    - senegal
+    flagSprite: {fileID: 0}
+  - countryName: Chad
+    acceptedAnswers:
+    - chad
+    flagSprite: {fileID: 0}
+  - countryName: Guinea
+    acceptedAnswers:
+    - guinea
+    flagSprite: {fileID: 0}
+  - countryName: Rwanda
+    acceptedAnswers:
+    - rwanda
+    flagSprite: {fileID: 0}
+  - countryName: Benin
+    acceptedAnswers:
+    - benin
+    flagSprite: {fileID: 0}
+  - countryName: Burundi
+    acceptedAnswers:
+    - burundi
+    flagSprite: {fileID: 0}
+  - countryName: Tunisia
+    acceptedAnswers:
+    - tunisia
+    flagSprite: {fileID: 0}
+  - countryName: Libya
+    acceptedAnswers:
+    - libya
+    flagSprite: {fileID: 0}
+  - countryName: Somalia
+    acceptedAnswers:
+    - somalia
+    flagSprite: {fileID: 0}
+  - countryName: Eritrea
+    acceptedAnswers:
+    - eritrea
+    flagSprite: {fileID: 0}
+  - countryName: Mauritania
+    acceptedAnswers:
+    - mauritania
+    flagSprite: {fileID: 0}
+  - countryName: Sierra Leone
+    acceptedAnswers:
+    - sierra leone
+    flagSprite: {fileID: 0}
+  - countryName: Togo
+    acceptedAnswers:
+    - togo
+    flagSprite: {fileID: 0}
+  - countryName: Liberia
+    acceptedAnswers:
+    - liberia
+    flagSprite: {fileID: 0}
+  - countryName: Central African Republic
+    acceptedAnswers:
+    - central african republic
+    - car
+    flagSprite: {fileID: 0}
+  - countryName: Congo
+    acceptedAnswers:
+    - congo
+    - republic of the congo
+    flagSprite: {fileID: 0}
+  - countryName: Democratic Republic of the Congo
+    acceptedAnswers:
+    - democratic republic of the congo
+    - drc
+    - zaire
+    flagSprite: {fileID: 0}
+  - countryName: Gabon
+    acceptedAnswers:
+    - gabon
+    flagSprite: {fileID: 0}
+  - countryName: Equatorial Guinea
+    acceptedAnswers:
+    - equatorial guinea
+    flagSprite: {fileID: 0}
+  - countryName: Botswana
+    acceptedAnswers:
+    - botswana
+    flagSprite: {fileID: 0}
+  - countryName: Namibia
+    acceptedAnswers:
+    - namibia
+    flagSprite: {fileID: 0}
+  - countryName: Lesotho
+    acceptedAnswers:
+    - lesotho
+    flagSprite: {fileID: 0}
+  - countryName: Swaziland
+    acceptedAnswers:
+    - swaziland
+    - eswatini
+    flagSprite: {fileID: 0}
+  - countryName: Mauritius
+    acceptedAnswers:
+    - mauritius
+    flagSprite: {fileID: 0}
+  - countryName: Djibouti
+    acceptedAnswers:
+    - djibouti
+    flagSprite: {fileID: 0}
+  - countryName: Comoros
+    acceptedAnswers:
+    - comoros
+    flagSprite: {fileID: 0}
+  - countryName: Cape Verde
+    acceptedAnswers:
+    - cape verde
+    flagSprite: {fileID: 0}
+  - countryName: Sao Tome and Principe
+    acceptedAnswers:
+    - sao tome and principe
+    flagSprite: {fileID: 0}
+  - countryName: Gambia
+    acceptedAnswers:
+    - gambia
+    flagSprite: {fileID: 0}
+  - countryName: Guinea Bissau
+    acceptedAnswers:
+    - guinea bissau
+    flagSprite: {fileID: 0}
+  - countryName: Australia
+    acceptedAnswers:
+    - australia
+    flagSprite: {fileID: 0}
+  - countryName: New Zealand
+    acceptedAnswers:
+    - new zealand
+    - aotearoa
+    flagSprite: {fileID: 0}
+  - countryName: Papua New Guinea
+    acceptedAnswers:
+    - papua new guinea
+    - png
+    flagSprite: {fileID: 0}
+  - countryName: Fiji
+    acceptedAnswers:
+    - fiji
+    flagSprite: {fileID: 0}
+  - countryName: Solomon Islands
+    acceptedAnswers:
+    - solomon islands
+    flagSprite: {fileID: 0}
+  - countryName: Vanuatu
+    acceptedAnswers:
+    - vanuatu
+    flagSprite: {fileID: 0}
+  - countryName: Samoa
+    acceptedAnswers:
+    - samoa
+    flagSprite: {fileID: 0}
+  - countryName: Kiribati
+    acceptedAnswers:
+    - kiribati
+    flagSprite: {fileID: 0}
+  - countryName: Micronesia
+    acceptedAnswers:
+    - micronesia
+    - federated states of micronesia
+    flagSprite: {fileID: 0}
+  - countryName: Marshall Islands
+    acceptedAnswers:
+    - marshall islands
+    flagSprite: {fileID: 0}
+  - countryName: Palau
+    acceptedAnswers:
+    - palau
+    flagSprite: {fileID: 0}
+  - countryName: Tonga
+    acceptedAnswers:
+    - tonga
+    flagSprite: {fileID: 0}
+  - countryName: Tuvalu
+    acceptedAnswers:
+    - tuvalu
+    flagSprite: {fileID: 0}
+  - countryName: Nauru
+    acceptedAnswers:
+    - nauru
     flagSprite: {fileID: 0}

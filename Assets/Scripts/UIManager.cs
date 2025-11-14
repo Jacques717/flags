@@ -300,6 +300,10 @@ public class UIManager : MonoBehaviour
         if (question.flagSprite == null)
         {
             Debug.LogWarning($"UIManager: Flag sprite is null for {question.countryName}. Sprite may not have loaded from Resources.");
+            // Clear the sprite so we don't show the previous flag
+            flagImage.sprite = null;
+            flagImage.enabled = false; // Hide the image when sprite is missing
+            Debug.Log($"UIManager: Cleared flag image for {question.countryName} (sprite file missing)");
         }
         else
         {

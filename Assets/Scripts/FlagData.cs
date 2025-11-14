@@ -24,19 +24,15 @@ public class FlagData : ScriptableObject
     
     public void InitializeDefaultFlags()
     {
-        flags = new List<FlagQuestion>
+        // Use the comprehensive list of all countries
+        flags = new List<FlagQuestion>();
+        
+        foreach (var country in AllCountriesList.GetAllCountries())
         {
-            new FlagQuestion("United States", new List<string> { "united states", "usa", "america", "us" }, null),
-            new FlagQuestion("United Kingdom", new List<string> { "united kingdom", "uk", "britain", "england" }, null),
-            new FlagQuestion("France", new List<string> { "france" }, null),
-            new FlagQuestion("Germany", new List<string> { "germany", "deutschland" }, null),
-            new FlagQuestion("Japan", new List<string> { "japan" }, null),
-            new FlagQuestion("Canada", new List<string> { "canada" }, null),
-            new FlagQuestion("Australia", new List<string> { "australia" }, null),
-            new FlagQuestion("Brazil", new List<string> { "brazil", "brasil" }, null),
-            new FlagQuestion("India", new List<string> { "india" }, null),
-            new FlagQuestion("Italy", new List<string> { "italy", "italia" }, null)
-        };
+            flags.Add(new FlagQuestion(country.countryName, country.acceptedAnswers, null));
+        }
+        
+        Debug.Log($"FlagData initialized with {flags.Count} countries");
     }
 }
 

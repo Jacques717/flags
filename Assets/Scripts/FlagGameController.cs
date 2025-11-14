@@ -145,9 +145,7 @@ public class FlagGameController : MonoBehaviour
     private void LoadFlagSprites()
     {
         // Load flag sprites from Resources/Sprites/Flags/
-        // Note: Resources.Load requires files to be in a Resources folder
-        // Alternative: Load from Assets/Sprites/Flags/ using AssetDatabase (Editor only)
-        // For runtime, sprites should be in Resources/Sprites/Flags/ or assigned in Inspector
+        // Try multiple naming conventions: country name format and ISO code format
         
         Debug.Log($"LoadFlagSprites: Loading sprites for {currentGameFlags.Count} flags");
         
@@ -155,19 +153,39 @@ public class FlagGameController : MonoBehaviour
         {
             if (flag.flagSprite == null)
             {
-                // Try loading from Resources first
+                Sprite sprite = null;
+                
+                // Try 1: Country name format (e.g., "unitedstates.png")
                 string spriteName = flag.countryName.Replace(" ", "").ToLower();
                 string resourcePath = $"Sprites/Flags/{spriteName}";
-                Sprite sprite = Resources.Load<Sprite>(resourcePath);
+                sprite = Resources.Load<Sprite>(resourcePath);
+                
+                // Try 2: ISO code format (e.g., "us.png")
+                if (sprite == null)
+                {
+                    string isoCode = CountryISOMapping.GetISOCode(flag.countryName);
+                    if (!string.IsNullOrEmpty(isoCode))
+                    {
+                        resourcePath = $"Sprites/Flags/{isoCode}";
+                        sprite = Resources.Load<Sprite>(resourcePath);
+                        if (sprite != null)
+                        {
+                            Debug.Log($"✓ Loaded sprite for {flag.countryName} using ISO code {isoCode} from {resourcePath}");
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log($"✓ Loaded sprite for {flag.countryName} from {resourcePath}");
+                }
                 
                 if (sprite != null)
                 {
                     flag.flagSprite = sprite;
-                    Debug.Log($"✓ Loaded sprite for {flag.countryName} from {resourcePath}");
                 }
                 else
                 {
-                    Debug.LogWarning($"✗ Flag sprite not found for {flag.countryName}. Expected at Resources/{resourcePath}.png");
+                    Debug.LogWarning($"✗ Flag sprite not found for {flag.countryName}. Tried: Sprites/Flags/{spriteName} and Sprites/Flags/{CountryISOMapping.GetISOCode(flag.countryName) ?? "N/A"}");
                     Debug.LogWarning("Make sure the file exists and is imported as 'Sprite (2D and UI)' in Unity.");
                 }
             }
