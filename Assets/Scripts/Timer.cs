@@ -73,5 +73,11 @@ public class Timer : MonoBehaviour
             isRunning = true;
         }
     }
+    
+    public void AddTime(float additionalTime)
+    {
+        currentTime += additionalTime;
+        Debug.Log($"Timer: Added {additionalTime} seconds. New time: {currentTime}");
+    }
 }
 

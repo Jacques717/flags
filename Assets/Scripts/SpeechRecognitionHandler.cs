@@ -59,9 +59,9 @@ public class SpeechRecognitionHandler : MonoBehaviour
     private void InitializeSpeechRecognition()
     {
 #if UNITY_EDITOR
-        // In editor, use keyboard input for testing
-        isInitialized = true;
-        Debug.Log("Speech Recognition: Using keyboard input mode in Editor");
+        // In editor, mark as not initialized - voice recognition not available in editor
+        isInitialized = false;
+        Debug.LogWarning("Speech Recognition: Voice input not available in Editor. Please test in a build.");
 #elif UNITY_ANDROID && !UNITY_EDITOR
         InitializeAndroidSpeechRecognition();
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -174,18 +174,23 @@ public class SpeechRecognitionHandler : MonoBehaviour
         {
             Debug.LogWarning($"Recognized phrase '{recognizedPhrase}' NOT in keyword list - but still reporting to game");
             // Still report it so user can see what was heard and game can check if it matches
-            OnSpeechRecognized?.Invoke(recognizedPhrase);
-            isRecording = false;
-            OnSpeechStopped?.Invoke();
+            if (isRecording)
+            {
+                OnSpeechRecognized?.Invoke(recognizedPhrase);
+                // Don't stop recording here - let the game decide when to stop
+            }
         }
     }
     
     private void OnWindowsKeywordRecognized(string recognizedText)
     {
         Debug.Log($"OnWindowsKeywordRecognized called with: '{recognizedText}'");
-        OnSpeechRecognized?.Invoke(recognizedText);
-        isRecording = false;
-        OnSpeechStopped?.Invoke();
+        if (isRecording)
+        {
+            OnSpeechRecognized?.Invoke(recognizedText);
+            // Don't stop recording here - let the game decide when to stop
+            // This allows for multiple attempts if wrong
+        }
     }
     
     private void StartWindowsListening()
@@ -254,10 +259,10 @@ public class SpeechRecognitionHandler : MonoBehaviour
         OnSpeechStarted?.Invoke();
         
 #if UNITY_EDITOR
-        if (useKeyboardInputInEditor)
-        {
-            StartKeyboardInput();
-        }
+        // Voice recognition not available in editor
+        Debug.LogWarning("Speech Recognition: Voice input not available in Editor. Please test in a build.");
+        isRecording = false;
+        OnSpeechStopped?.Invoke();
 #elif UNITY_ANDROID && !UNITY_EDITOR
         StartAndroidListening();
 #elif UNITY_IOS && !UNITY_EDITOR

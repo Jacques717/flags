@@ -203,7 +203,7 @@ public class SceneSetupHelper : EditorWindow
     }
     
     [MenuItem("Game/Setup UI/MainMenu UI")]
-    private static void SetupMainMenuUI()
+    public static void SetupMainMenuUI()
     {
         // Check if in play mode
         if (Application.isPlaying)
@@ -403,7 +403,7 @@ public class SceneSetupHelper : EditorWindow
     }
     
     [MenuItem("Game/Setup UI/GameScene UI")]
-    private static void SetupGameSceneUI()
+    public static void SetupGameSceneUI()
     {
         // Check if in play mode
         if (Application.isPlaying)
@@ -599,6 +599,37 @@ public class SceneSetupHelper : EditorWindow
             feedbackRect.offsetMax = new Vector2(-10, -10);
         }
         
+        // Create Wrong Answer Side Panel
+        GameObject wrongAnswerPanel = GameObject.Find("WrongAnswerPanel");
+        if (wrongAnswerPanel == null)
+        {
+            wrongAnswerPanel = new GameObject("WrongAnswerPanel");
+            wrongAnswerPanel.transform.SetParent(gamePanel.transform, false);
+            UnityEngine.UI.Image wrongPanelImage = wrongAnswerPanel.AddComponent<UnityEngine.UI.Image>();
+            wrongPanelImage.color = new Color(0.3f, 0, 0, 0.9f); // Dark red background - more visible
+            RectTransform wrongPanelRect = wrongAnswerPanel.GetComponent<RectTransform>();
+            wrongPanelRect.anchorMin = new Vector2(0.85f, 0.2f); // Right side - wider (15% of screen)
+            wrongPanelRect.anchorMax = new Vector2(0.98f, 0.85f); // Right side, top portion - taller
+            wrongPanelRect.anchoredPosition = Vector2.zero;
+            wrongPanelRect.sizeDelta = Vector2.zero;
+            wrongAnswerPanel.SetActive(false);
+            
+            // Wrong Answer Text
+            GameObject wrongAnswerTextObj = new GameObject("WrongAnswerText");
+            wrongAnswerTextObj.transform.SetParent(wrongAnswerPanel.transform, false);
+            UnityEngine.UI.Text wrongAnswerText = wrongAnswerTextObj.AddComponent<UnityEngine.UI.Text>();
+            wrongAnswerText.text = "Wrong attempts:";
+            wrongAnswerText.fontSize = 16;
+            wrongAnswerText.alignment = TextAnchor.UpperLeft;
+            wrongAnswerText.color = Color.red;
+            RectTransform wrongTextRect = wrongAnswerTextObj.GetComponent<RectTransform>();
+            wrongTextRect.anchorMin = Vector2.zero;
+            wrongTextRect.anchorMax = Vector2.one;
+            wrongTextRect.sizeDelta = Vector2.zero;
+            wrongTextRect.offsetMin = new Vector2(5, 5); // Padding
+            wrongTextRect.offsetMax = new Vector2(-5, -5);
+        }
+        
         // Create Score Screen Panel
         GameObject scoreScreenPanel = GameObject.Find("ScoreScreenPanel");
         if (scoreScreenPanel == null)
@@ -696,6 +727,8 @@ public class SceneSetupHelper : EditorWindow
                 System.Reflection.FieldInfo micIndicatorField = typeof(UIManager).GetField("microphoneVolumeIndicator", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo feedbackPanelField = typeof(UIManager).GetField("feedbackPanel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo feedbackTextField = typeof(UIManager).GetField("feedbackText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                System.Reflection.FieldInfo wrongAnswerPanelField = typeof(UIManager).GetField("wrongAnswerPanel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                System.Reflection.FieldInfo wrongAnswerTextField = typeof(UIManager).GetField("wrongAnswerText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo scoreScreenPanelField = typeof(UIManager).GetField("scoreScreenPanel", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo finalScoreTextField = typeof(UIManager).GetField("finalScoreText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 System.Reflection.FieldInfo returnToMenuButtonField = typeof(UIManager).GetField("returnToMenuButton", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -710,6 +743,8 @@ public class SceneSetupHelper : EditorWindow
                 if (micIndicatorField != null) micIndicatorField.SetValue(uiManager, GameObject.Find("MicrophoneVolumeIndicator")?.GetComponent<UnityEngine.UI.Image>());
                 if (feedbackPanelField != null) feedbackPanelField.SetValue(uiManager, feedbackPanel);
                 if (feedbackTextField != null) feedbackTextField.SetValue(uiManager, GameObject.Find("FeedbackText")?.GetComponent<UnityEngine.UI.Text>());
+                if (wrongAnswerPanelField != null) wrongAnswerPanelField.SetValue(uiManager, wrongAnswerPanel);
+                if (wrongAnswerTextField != null) wrongAnswerTextField.SetValue(uiManager, GameObject.Find("WrongAnswerText")?.GetComponent<UnityEngine.UI.Text>());
                 if (scoreScreenPanelField != null) scoreScreenPanelField.SetValue(uiManager, scoreScreenPanel);
                 if (finalScoreTextField != null) finalScoreTextField.SetValue(uiManager, GameObject.Find("FinalScoreText")?.GetComponent<UnityEngine.UI.Text>());
                 if (returnToMenuButtonField != null) returnToMenuButtonField.SetValue(uiManager, GameObject.Find("ReturnToMenuButton")?.GetComponent<UnityEngine.UI.Button>());

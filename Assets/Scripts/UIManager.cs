@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 using System.Linq;
 // using TMPro; // Commented out - will use regular Text instead for now
 
@@ -27,6 +28,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text feedbackText;
     [SerializeField] private Color correctColor = Color.green;
     [SerializeField] private Color incorrectColor = Color.red;
+    
+    [Header("Wrong Answer Side Feedback")]
+    [SerializeField] private GameObject wrongAnswerPanel; // Side panel for wrong answers
+    [SerializeField] private Text wrongAnswerText; // Text showing wrong attempts
     
     [Header("Score Screen UI")]
     [SerializeField] private GameObject scoreScreenPanel;
@@ -108,6 +113,18 @@ public class UIManager : MonoBehaviour
                 GameObject found = FindGameObjectInScene("FeedbackText");
                 if (found != null)
                     feedbackText = found.GetComponent<Text>();
+            }
+            
+            if (wrongAnswerPanel == null)
+            {
+                wrongAnswerPanel = FindGameObjectInScene("WrongAnswerPanel");
+            }
+            
+            if (wrongAnswerText == null && wrongAnswerPanel != null)
+            {
+                GameObject found = FindGameObjectInScene("WrongAnswerText");
+                if (found != null)
+                    wrongAnswerText = found.GetComponent<Text>();
             }
             
             if (scoreScreenPanel == null)
@@ -325,7 +342,17 @@ public class UIManager : MonoBehaviour
         // Hide feedback
         if (feedbackPanel != null)
             feedbackPanel.SetActive(false);
+        
+        // Clear wrong answer feedback
+        if (wrongAnswerPanel != null)
+            wrongAnswerPanel.SetActive(false);
+        
+        // Clear wrong answers list
+        wrongAnswersList.Clear();
     }
+    
+    // Track wrong answers for side display
+    private List<string> wrongAnswersList = new List<string>();
     
     public void UpdateTimer(float timeRemaining)
     {
@@ -340,6 +367,120 @@ public class UIManager : MonoBehaviour
         if (scoreText != null)
         {
             scoreText.text = $"Score: {score}/{total}";
+        }
+    }
+    
+    public void ShowWrongAnswerFeedback(string recognizedText, string correctAnswer)
+    {
+        Debug.Log($"=== ShowWrongAnswerFeedback called ===\nRecognized: '{recognizedText}'\nCorrect: '{correctAnswer}'");
+        
+        // Add to wrong answers list
+        if (!string.IsNullOrEmpty(recognizedText))
+        {
+            wrongAnswersList.Add(recognizedText);
+            Debug.Log($"Added to wrongAnswersList. Count: {wrongAnswersList.Count}");
+            UpdateWrongAnswerDisplay();
+        }
+        else
+        {
+            Debug.LogWarning("ShowWrongAnswerFeedback called with empty recognizedText!");
+        }
+    }
+    
+    public void ShowUnrecognizedSpeechPrompt()
+    {
+        // Show "Sorry, didn't get that, say again" message
+        if (listeningText != null)
+        {
+            listeningText.text = "❌ Sorry, didn't get that... Say again";
+            listeningText.color = Color.yellow;
+            listeningText.gameObject.SetActive(true);
+            
+            // Reset after 2 seconds
+            StartCoroutine(ResetListeningTextAfterDelay(2f));
+        }
+    }
+    
+    private System.Collections.IEnumerator ResetListeningTextAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (listeningText != null)
+        {
+            listeningText.text = "🎤 Listening... Say a country name";
+            listeningText.color = Color.cyan;
+        }
+    }
+    
+    private void UpdateWrongAnswerDisplay()
+    {
+        Debug.Log($"=== UpdateWrongAnswerDisplay called ===\nWrong answers count: {wrongAnswersList.Count}");
+        
+        if (wrongAnswerPanel == null)
+        {
+            // Try to find it
+            wrongAnswerPanel = FindGameObjectInScene("WrongAnswerPanel");
+            Debug.Log($"WrongAnswerPanel found: {wrongAnswerPanel != null}");
+        }
+        
+        if (wrongAnswerPanel != null)
+        {
+            // Ensure parent is active
+            Transform parent = wrongAnswerPanel.transform.parent;
+            if (parent != null && !parent.gameObject.activeSelf)
+            {
+                Debug.LogWarning($"WrongAnswerPanel parent ({parent.name}) is inactive! Activating...");
+                parent.gameObject.SetActive(true);
+            }
+            
+            wrongAnswerPanel.SetActive(true);
+            Debug.Log($"WrongAnswerPanel activated: {wrongAnswerPanel.activeSelf}, Parent active: {(parent != null ? parent.gameObject.activeSelf.ToString() : "null")}");
+            
+            // Ensure it's visible (bring to front)
+            wrongAnswerPanel.transform.SetAsLastSibling();
+            
+            if (wrongAnswerText == null)
+            {
+                // Try to find it
+                GameObject found = FindGameObjectInScene("WrongAnswerText");
+                if (found != null)
+                {
+                    wrongAnswerText = found.GetComponent<Text>();
+                    Debug.Log($"WrongAnswerText found: {wrongAnswerText != null}");
+                }
+                else
+                {
+                    Debug.LogWarning("WrongAnswerText GameObject not found in scene!");
+                }
+            }
+            
+            if (wrongAnswerText != null)
+            {
+                // Build list of wrong answers with red X
+                string displayText = "Wrong attempts:\n";
+                foreach (string wrongAnswer in wrongAnswersList)
+                {
+                    displayText += $"✗ {wrongAnswer}\n";
+                }
+                wrongAnswerText.text = displayText;
+                wrongAnswerText.color = Color.red;
+                wrongAnswerText.gameObject.SetActive(true);
+                
+                // Ensure text is visible
+                if (wrongAnswerText.transform.parent != null)
+                {
+                    wrongAnswerText.transform.parent.gameObject.SetActive(true);
+                }
+                
+                Debug.Log($"WrongAnswerText updated:\n{displayText}\nText active: {wrongAnswerText.gameObject.activeSelf}");
+            }
+            else
+            {
+                Debug.LogError("WrongAnswerText component is null! Cannot display wrong answers.");
+            }
+        }
+        else
+        {
+            Debug.LogError("WrongAnswerPanel is null! Cannot display wrong answers. You may need to run 'Tools > Setup Game Scene UI' to create it.");
         }
     }
     
@@ -753,6 +894,7 @@ public class UIManager : MonoBehaviour
     private int microphoneSampleRate = 44100;
     private int lastMicrophonePosition = 0;
     private bool isMicrophoneActive = false;
+    private float microphoneStartTime = 0f; // Track when mic was started
     
     private void Update()
     {
@@ -800,48 +942,138 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    private float GetMicrophoneVolume()
+    public float GetMicrophoneVolume()
     {
         if (microphoneClip == null)
         {
             // Start microphone recording
-            if (Microphone.devices.Length > 0)
+            int deviceCount = Microphone.devices.Length;
+            Debug.Log($"GetMicrophoneVolume: Microphone devices found: {deviceCount}");
+            
+            if (deviceCount > 0)
             {
                 try
                 {
                     microphoneDevice = Microphone.devices[0];
+                    Debug.Log($"GetMicrophoneVolume: Starting microphone: {microphoneDevice}");
                     microphoneClip = Microphone.Start(microphoneDevice, true, 1, microphoneSampleRate);
+                    
+                    if (microphoneClip == null)
+                    {
+                        Debug.LogError("GetMicrophoneVolume: Microphone.Start returned null!");
+                        isMicrophoneActive = false;
+                        return 0f;
+                    }
+                    
                     lastMicrophonePosition = 0;
                     isMicrophoneActive = true;
+                    microphoneStartTime = Time.time; // Record when mic started
+                    Debug.Log($"GetMicrophoneVolume: Microphone started successfully. Clip: {microphoneClip.name}, Frequency: {microphoneClip.frequency}");
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogWarning($"Failed to start microphone: {e.Message}");
+                    Debug.LogError($"GetMicrophoneVolume: Failed to start microphone: {e.Message}\n{e.StackTrace}");
                     isMicrophoneActive = false;
                     return 0f;
                 }
             }
             else
             {
+                Debug.LogWarning("GetMicrophoneVolume: No microphone devices found!");
                 isMicrophoneActive = false;
                 return 0f;
             }
         }
         
         if (microphoneClip == null || !isMicrophoneActive)
+        {
+            Debug.LogWarning($"GetMicrophoneVolume: Microphone not active. Clip: {microphoneClip != null}, Active: {isMicrophoneActive}");
             return 0f;
+        }
+        
+        // Wait for microphone to start recording (it needs a moment to initialize)
+        // Give it at least 0.3 seconds to start
+        if ((Time.time - microphoneStartTime) < 0.3f)
+        {
+            return 0f;
+        }
+        
+        // Check if microphone is actually recording
+        if (!Microphone.IsRecording(microphoneDevice))
+        {
+            // Try to restart if it stopped
+            if ((Time.time - microphoneStartTime) > 1f)
+            {
+                Debug.LogWarning("Microphone stopped recording - attempting restart");
+                try
+                {
+                    Microphone.End(microphoneDevice);
+                    microphoneClip = Microphone.Start(microphoneDevice, true, 1, microphoneSampleRate);
+                    lastMicrophonePosition = 0;
+                    microphoneStartTime = Time.time;
+                    return 0f;
+                }
+                catch
+                {
+                    return 0f;
+                }
+            }
+            return 0f;
+        }
         
         int currentPosition = Microphone.GetPosition(microphoneDevice);
         if (currentPosition < 0 || microphoneDevice == null)
+        {
             return 0f;
+        }
         
-        // Get audio data
+        // Get audio data - handle wrap-around
         int samplesToRead = currentPosition - lastMicrophonePosition;
         if (samplesToRead < 0)
+        {
+            // Wrapped around
             samplesToRead += microphoneClip.samples;
+        }
         
+        // If position hasn't changed, we might still have data to read
+        // Try reading a small buffer anyway to detect activity
+        if (samplesToRead == 0)
+        {
+            // Position hasn't advanced - try reading last 1024 samples anyway
+            int readSize = Mathf.Min(1024, microphoneClip.samples);
+            if (readSize > 0)
+            {
+                int readPos = (currentPosition - readSize + microphoneClip.samples) % microphoneClip.samples;
+                float[] samples = new float[readSize];
+                microphoneClip.GetData(samples, readPos);
+                
+                float sum = 0f;
+                for (int i = 0; i < samples.Length; i++)
+                {
+                    sum += samples[i] * samples[i];
+                }
+                float rms = Mathf.Sqrt(sum / samples.Length);
+                float volume = Mathf.Clamp01(rms * 30f); // Higher amplification
+                
+                if (volume > 0.001f)
+                {
+                    return volume;
+                }
+            }
+            return 0f;
+        }
+        
+        // Read the new samples
         if (samplesToRead > 0)
         {
+            // Limit read size to prevent large allocations
+            int maxRead = 4096;
+            if (samplesToRead > maxRead)
+            {
+                lastMicrophonePosition = (currentPosition - maxRead + microphoneClip.samples) % microphoneClip.samples;
+                samplesToRead = maxRead;
+            }
+            
             float[] samples = new float[samplesToRead];
             microphoneClip.GetData(samples, lastMicrophonePosition);
             
@@ -853,9 +1085,15 @@ public class UIManager : MonoBehaviour
             }
             float rms = Mathf.Sqrt(sum / samples.Length);
             
-            // Normalize to 0-1 range and amplify
-            float volume = Mathf.Clamp01(rms * 10f);
+            // Normalize to 0-1 range and amplify (much more sensitive)
+            float volume = Mathf.Clamp01(rms * 30f); // Increased from 20f to 30f
             
+            // Even very quiet sounds should register some volume
+            if (volume < 0.005f && rms > 0.0001f)
+            {
+                volume = 0.01f; // Minimum detectable volume
+            }
+
             lastMicrophonePosition = currentPosition;
             return volume;
         }
